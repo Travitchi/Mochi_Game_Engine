@@ -153,6 +153,7 @@
     <ClInclude Include="src\core\application.h" />
     <ClInclude Include="src\core\asserts.h" />
     <ClInclude Include="src\core\event.h" />
+    <ClInclude Include="src\core\input.h" />
     <ClInclude Include="src\core\logger.h" />
     <ClInclude Include="src\core\M_memory.h" />
     <ClInclude Include="src\defines.hpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="src\containers\darray.cpp" />
     <ClCompile Include="src\core\application.cpp" />
     <ClCompile Include="src\core\event.cpp" />
+    <ClCompile Include="src\core\input.cpp" />
     <ClCompile Include="src\core\logger.cpp" />
     <ClCompile Include="src\core\M_memory.cpp" />
     <ClCompile Include="src\Platform\platform_SDL2.cpp" />
