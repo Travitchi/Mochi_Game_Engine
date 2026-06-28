@@ -1,58 +1,4 @@
-﻿  darray.cpp
-  application.cpp
-  event.cpp
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  logger.cpp
-  (compiling source file 'src/containers/darray.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/containers/darray.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/containers/darray.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/containers/darray.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/application.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/application.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/application.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/application.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(17,2): warning C4091: 'typedef ': ignored on left of 'application_state' when no variable is declared
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/logger.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/logger.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/logger.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/logger.cpp')
-  
-  M_memory.cpp
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/M_memory.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/M_memory.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/M_memory.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/core/M_memory.cpp')
-  
-  platform_SDL2.cpp
+﻿  platform_SDL2.cpp
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/Platform/platform_SDL2.cpp')
   
@@ -65,7 +11,10 @@ C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/Platform/platform_SDL2.cpp')
   
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\Platform\platform_SDL2.cpp(170,11): warning C4244: 'argument': conversion from 'u64' to 'DWORD', possible loss of data
-  Generating Code...
-     Creating library C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.lib and object C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.exp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+  (compiling source file 'src/Platform/platform_SDL2.cpp')
+      C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\External\GLAD\include\glad.h(32,1):
+      see previous definition of 'APIENTRY'
+  
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\Platform\platform_SDL2.cpp(187,11): warning C4244: 'argument': conversion from 'u64' to 'DWORD', possible loss of data
   Engine.vcxproj -> C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.dll

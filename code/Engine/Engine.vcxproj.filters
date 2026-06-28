@@ -51,6 +51,9 @@
     <ClInclude Include="src\core\input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\core\clock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\logger.cpp">
@@ -72,6 +75,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\clock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

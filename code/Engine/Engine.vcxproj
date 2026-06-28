@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>KEXPORT;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\core;$(ProjectDir)src;$(ProjectDir)src\Platform;$(SolutionDir)External\SDL2\include;$(SolutionDir)Engine\src\containers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\core;$(ProjectDir)src;$(ProjectDir)src\Platform;$(SolutionDir)External\GLAD\include;$(SolutionDir)External\SDL2\include;$(SolutionDir)Engine\src\containers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,6 +152,7 @@
     <ClInclude Include="src\containers\darray.h" />
     <ClInclude Include="src\core\application.h" />
     <ClInclude Include="src\core\asserts.h" />
+    <ClInclude Include="src\core\clock.h" />
     <ClInclude Include="src\core\event.h" />
     <ClInclude Include="src\core\input.h" />
     <ClInclude Include="src\core\logger.h" />
@@ -164,10 +165,12 @@
   <ItemGroup>
     <ClCompile Include="src\containers\darray.cpp" />
     <ClCompile Include="src\core\application.cpp" />
+    <ClCompile Include="src\core\clock.cpp" />
     <ClCompile Include="src\core\event.cpp" />
     <ClCompile Include="src\core\input.cpp" />
     <ClCompile Include="src\core\logger.cpp" />
     <ClCompile Include="src\core\M_memory.cpp" />
+    <ClCompile Include="src\Platform\glad.c" />
     <ClCompile Include="src\Platform\platform_SDL2.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,6 +1,9 @@
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\containers\darray.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\darray.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\application.obj
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\clock.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\clock.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\event.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\event.obj
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\input.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\input.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\logger.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\M_memory.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\M_memory.obj
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\Platform\glad.c;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\glad.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\Platform\platform_SDL2.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\platform_SDL2.obj

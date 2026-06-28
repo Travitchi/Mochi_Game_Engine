@@ -1,16 +1,22 @@
 #include "Platform.h"
 #if KPLATFORM_WINDOWS 
 #include "core/logger.h"
+#include "glad.h"
 #include <SDL.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <windows.h>
 #include <windowsx.h>
+#include "input.h"
+#include "event.h"
+
 
 // SDL2 Platform layer
-typedef struct internal_state {
+typedef struct internal_state 
+{
     SDL_Window* window;
+    SDL_GLContext gl_context;
 } internal_state;
 
 static f64 clock_frequency;
@@ -27,13 +33,30 @@ b8 platform_initialize(platform_state* plat_state, const char* application_name,
         return FALSE;
     }
 
-    state->window = SDL_CreateWindow(application_name,x, y,width, height,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    state->window = SDL_CreateWindow(application_name,x, y,width, height,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
     if (state->window == NULL) 
     {
         MFATAL("Creazione finestra fallita: %s", SDL_GetError());
         return FALSE;
     }
+
+    state->gl_context = SDL_GL_CreateContext(state->window);
+    if (state->gl_context == NULL) {
+        MFATAL("Failed to create OpenGL context: %s", SDL_GetError());
+        return FALSE;
+    }
+
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        MFATAL("Failed to initialize GLAD/OpenGL!");
+        return FALSE;
+    }
+
+    MINFO("OpenGL Version Loaded: %s", glGetString(GL_VERSION));
 	LARGE_INTEGER frequency;
 	QueryPerformanceFrequency(&frequency);
 	clock_frequency = 1.0 / (f64)frequency.QuadPart;
@@ -59,59 +82,53 @@ void platform_shutdown(platform_state* plat_state)
 
 b8 platform_pump_messages(platform_state* plat_state) {
     SDL_Event event;
-    while (SDL_PollEvent(&event)) 
-    {
-        switch (event.type) 
-        {
-        case SDL_QUIT:
-            return FALSE;
-
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT: {
+            event_context data = {};
+            event_fire(EVENT_CODE_APPLICATION_QUIT, 0, data);
+            return TRUE; // Let the event system handle the shutdown!
+        } break;
         case SDL_KEYDOWN:
-        case SDL_KEYUP: 
-        {
+        case SDL_KEYUP: {
             b8 pressed = (event.type == SDL_KEYDOWN);
-            // SDL_Keycode key_code = event.key.keysym.sym;
-            // TODO: Pass this to your Input System
+            // SDL gives
+            u16 key_code = event.key.keysym.scancode;
+
+            // Assicurati di non sforare il limite dell'array della tastiera
+            if (key_code < 256) {
+                input_process_key((keys)key_code, pressed);
+            }
         } break;
 
-        case SDL_MOUSEMOTION: 
-        {
-            i32 x = event.motion.x;
-            i32 y = event.motion.y;
-            // TODO: Pass this to your Input System
+        case SDL_MOUSEMOTION: {
+            input_process_mouse_move(event.motion.x, event.motion.y);
         } break;
 
         case SDL_MOUSEBUTTONDOWN:
-        case SDL_MOUSEBUTTONUP: 
-        {
+        case SDL_MOUSEBUTTONUP: {
             b8 pressed = (event.type == SDL_MOUSEBUTTONDOWN);
+            buttons mouse_button = BUTTON_MAX_BUTTONS;
 
-            // event.button.button tells you WHICH button it was:
-            // SDL_BUTTON_LEFT, SDL_BUTTON_RIGHT, SDL_BUTTON_MIDDLE
-            u8 mouse_button = event.button.button;
+            switch (event.button.button) {
+            case SDL_BUTTON_LEFT:   mouse_button = BUTTON_LEFT; break;
+            case SDL_BUTTON_RIGHT:  mouse_button = BUTTON_RIGHT; break;
+            case SDL_BUTTON_MIDDLE: mouse_button = BUTTON_MIDDLE; break;
+            }
 
-            // TODO: Pass this to your Input System
+            if (mouse_button != BUTTON_MAX_BUTTONS) {
+                input_process_button(mouse_button, pressed);
+            }
         } break;
 
-        case SDL_MOUSEWHEEL: 
-        {
-            // event.wheel.y is positive if scrolling up, negative if scrolling down
-            i32 z_delta = event.wheel.y;
-
-            // TODO: Pass this to your Input System
-        } break;
-
-        case SDL_WINDOWEVENT: 
-        {
-            if (event.window.event == SDL_WINDOWEVENT_RESIZED) 
-            {
-                // i32 new_width = event.window.data1;
-                // i32 new_height = event.window.data2;
-                // TODO: Fire an event for window resize
+        case SDL_MOUSEWHEEL: {
+            if (event.wheel.y != 0) {
+                input_process_mouse_wheel(event.wheel.y);
             }
         } break;
         }
     }
+
     return TRUE;
 }
 
