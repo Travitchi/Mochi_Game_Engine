@@ -32,10 +32,13 @@ b8 platform_initialize(platform_state* plat_state, const char* application_name,
         MFATAL("Startup Failed: %s", SDL_GetError());
         return FALSE;
     }
-
+    //OpenGL Version
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    //Depth Buffer for 2.5D layering
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
     state->window = SDL_CreateWindow(application_name,x, y,width, height,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 

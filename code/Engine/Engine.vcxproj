@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>KEXPORT;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\core;$(ProjectDir)src;$(ProjectDir)src\Platform;$(SolutionDir)External\GLAD\include;$(SolutionDir)External\SDL2\include;$(SolutionDir)Engine\src\containers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\core;$(ProjectDir)src;$(ProjectDir)src\Platform;$(SolutionDir)External\GLAD\include;$(SolutionDir)External\SDL2\include;$(SolutionDir)Engine\src\containers;$(ProjectDir)src\renderer;$(ProjectDir)src\renderer\OpenGL;$(SolutionDir)Engine\src\math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,7 +160,12 @@
     <ClInclude Include="src\defines.hpp" />
     <ClInclude Include="src\entry.h" />
     <ClInclude Include="src\game_types.h" />
+    <ClInclude Include="src\math\math_type.h" />
+    <ClInclude Include="src\math\M_math.h" />
     <ClInclude Include="src\Platform\Platform.h" />
+    <ClInclude Include="src\renderer\OpenGL\opengl_backend.h" />
+    <ClInclude Include="src\renderer\renderer_backend.h" />
+    <ClInclude Include="src\renderer\renderer_frontend.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\containers\darray.cpp" />
@@ -172,6 +177,8 @@
     <ClCompile Include="src\core\M_memory.cpp" />
     <ClCompile Include="src\Platform\glad.c" />
     <ClCompile Include="src\Platform\platform_SDL2.cpp" />
+    <ClCompile Include="src\renderer\OpenGL\opengl_backend.cpp" />
+    <ClCompile Include="src\renderer\renderer_frontend.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,6 +3,7 @@
 
 b8 game_initialize(game* game_inst)
 {
+	//remove when not debugging
 	MDEBUG("game_initialize called!");
 	return TRUE;
 }

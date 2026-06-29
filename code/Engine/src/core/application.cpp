@@ -7,6 +7,7 @@
 #include "input.h"
 #include "SDL.h"
 #include "clock.h"
+#include "renderer_frontend.h"
 
 typedef struct application_state
 {
@@ -78,6 +79,14 @@ KAPI b8 application_create(game* game_inst)
 		return FALSE;
 	}
 
+	//renderer startup
+	if (!renderer_initialize(game_inst->app_config.name, &app_state.platform)) 
+	{
+		MFATAL("Failed to initialize renderer. Shutting down.");
+		return FALSE;
+	}
+
+	//initialize game
 	if (!app_state.game_inst->initialize(app_state.game_inst))
 	{
 		MFATAL("Game Failed to Initialize");
@@ -103,6 +112,7 @@ KAPI b8 application_run()
 
 	while (app_state.is_run)
 	{
+		
 		if (!platform_pump_messages(&app_state.platform))
 		{
 			app_state.is_run = FALSE;
@@ -128,6 +138,11 @@ KAPI b8 application_run()
 				break;
 			}
 
+			//todo: refactor packet creation
+			render_packet packet;
+			packet.delta_time = delta;
+			renderer_draw_frame(&packet);
+
 			f64 frame_end_time = platform_get_absolute_time();
 			f64 frame_elapsed_time = frame_end_time - frame_start_time;
 			running_time += frame_elapsed_time;
@@ -148,16 +163,20 @@ KAPI b8 application_run()
 
 			input_update(delta);
 			app_state.last_time = current_time;
+
+
 		}
 	}
 
 	app_state.is_run = FALSE;
 
+	//shutdown system
 	event_unregister(EVENT_CODE_APPLICATION_QUIT, 0, application_on_event);
 	event_unregister(EVENT_CODE_KEY_PRESSED, 0, application_on_key);
 	event_unregister(EVENT_CODE_KEY_RELEASED, 0, application_on_key);
 	event_shutdown();
 	input_shutdown();
+	renderer_shutdown();
 
 	platform_shutdown(&app_state.platform);
 

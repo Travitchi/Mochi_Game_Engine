@@ -1,1 +1,28 @@
-﻿  TestBed.vcxproj -> C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\TestBed.exe
+﻿  entry.cpp
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/entry.cpp')
+  
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/entry.cpp')
+  
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/entry.cpp')
+  
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/entry.cpp')
+  
+  game.cpp
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/game.cpp')
+  
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/game.cpp')
+  
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/game.cpp')
+  
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/game.cpp')
+  
+  Generating Code...
+  TestBed.vcxproj -> C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\TestBed.exe
