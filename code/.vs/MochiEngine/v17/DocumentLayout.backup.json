@@ -3,8 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\renderer\\OpenGL\\opengl_backend.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|solutionrelative:Engine\\src\\renderer\\OpenGL\\opengl_backend.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\defines.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|solutionrelative:Engine\\src\\defines.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\core\\application.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|solutionrelative:Engine\\src\\core\\application.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\math_type.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|solutionrelative:Engine\\src\\math\\math_type.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\M_math.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|solutionrelative:Engine\\src\\math\\M_math.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\M_math.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6D916F0B-8A65-4017-8581-51F78D4E97DB}|Engine\\Engine.vcxproj|solutionrelative:Engine\\src\\math\\M_math.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,12 +39,77 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "opengl_backend.cpp",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\renderer\\OpenGL\\opengl_backend.cpp",
+              "RelativeDocumentMoniker": "Engine\\src\\renderer\\OpenGL\\opengl_backend.cpp",
+              "ToolTip": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\renderer\\OpenGL\\opengl_backend.cpp",
+              "RelativeToolTip": "Engine\\src\\renderer\\OpenGL\\opengl_backend.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-07-01T18:38:37.451Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "defines.hpp",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\defines.hpp",
+              "RelativeDocumentMoniker": "Engine\\src\\defines.hpp",
+              "ToolTip": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\defines.hpp",
+              "RelativeToolTip": "Engine\\src\\defines.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-07-01T18:38:27.785Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "application.cpp",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\core\\application.cpp",
+              "RelativeDocumentMoniker": "Engine\\src\\core\\application.cpp",
+              "ToolTip": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\core\\application.cpp",
+              "RelativeToolTip": "Engine\\src\\core\\application.cpp",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-07-01T18:37:30.046Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "M_math.cpp",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\M_math.cpp",
+              "RelativeDocumentMoniker": "Engine\\src\\math\\M_math.cpp",
+              "ToolTip": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\M_math.cpp",
+              "RelativeToolTip": "Engine\\src\\math\\M_math.cpp",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAwEEAAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-07-01T17:23:38.32Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "M_math.h",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\M_math.h",
+              "RelativeDocumentMoniker": "Engine\\src\\math\\M_math.h",
+              "ToolTip": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\M_math.h",
+              "RelativeToolTip": "Engine\\src\\math\\M_math.h",
+              "ViewState": "AgIAAKQBAAAAAAAAAAAAACwAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-06-29T21:44:51.292Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "math_type.h",
               "DocumentMoniker": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\math_type.h",
               "RelativeDocumentMoniker": "Engine\\src\\math\\math_type.h",
-              "ToolTip": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\math_type.h*",
-              "RelativeToolTip": "Engine\\src\\math\\math_type.h*",
-              "ViewState": "AgIAADEAAAAAAAAAAADwv08AAAATAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\User\\Desktop\\MOCHI\\Mochi_Game_Engine\\code\\Engine\\src\\math\\math_type.h",
+              "RelativeToolTip": "Engine\\src\\math\\math_type.h",
+              "ViewState": "AgIAACQAAAAAAAAAAAAAAFgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2026-06-29T19:54:34.831Z",
               "EditorCaption": ""

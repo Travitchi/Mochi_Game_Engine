@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>KEXPORT;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\core;$(ProjectDir)src;$(ProjectDir)src\Platform;$(SolutionDir)External\GLAD\include;$(SolutionDir)External\SDL2\include;$(SolutionDir)Engine\src\containers;$(ProjectDir)src\renderer;$(ProjectDir)src\renderer\OpenGL;$(SolutionDir)Engine\src\math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\core;$(ProjectDir)src;$(ProjectDir)src\Platform;$(SolutionDir)External\GLAD\include;$(SolutionDir)External\SDL2\include;$(SolutionDir)Engine\src\containers;$(ProjectDir)src\renderer;$(ProjectDir)src\renderer\OpenGL;$(SolutionDir)Engine\src\math;$(ProjectDir)src\renderer\OpenGL\shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,6 +164,8 @@
     <ClInclude Include="src\math\M_math.h" />
     <ClInclude Include="src\Platform\Platform.h" />
     <ClInclude Include="src\renderer\OpenGL\opengl_backend.h" />
+    <ClInclude Include="src\renderer\OpenGL\shaders\M_object_shader.h" />
+    <ClInclude Include="src\renderer\OpenGL\shaders\M_shader_utils.h" />
     <ClInclude Include="src\renderer\renderer_backend.h" />
     <ClInclude Include="src\renderer\renderer_frontend.h" />
   </ItemGroup>
@@ -175,9 +177,11 @@
     <ClCompile Include="src\core\input.cpp" />
     <ClCompile Include="src\core\logger.cpp" />
     <ClCompile Include="src\core\M_memory.cpp" />
+    <ClCompile Include="src\math\M_math.cpp" />
     <ClCompile Include="src\Platform\glad.c" />
     <ClCompile Include="src\Platform\platform_SDL2.cpp" />
     <ClCompile Include="src\renderer\OpenGL\opengl_backend.cpp" />
+    <ClCompile Include="src\renderer\OpenGL\shaders\M_obj_shader.cpp" />
     <ClCompile Include="src\renderer\renderer_frontend.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

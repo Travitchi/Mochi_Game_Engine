@@ -1,4 +1,5 @@
 ﻿  darray.cpp
+  application.cpp
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/containers/darray.cpp')
   
@@ -11,7 +12,6 @@ C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/containers/darray.cpp')
   
-  application.cpp
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/core/application.cpp')
   
@@ -69,6 +69,7 @@ C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/core/M_memory.cpp')
   
+  M_math.cpp
   platform_SDL2.cpp
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/Platform/platform_SDL2.cpp')
@@ -115,5 +116,5 @@ C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5
   (compiling source file 'src/renderer/renderer_frontend.cpp')
   
   Generating Code...
-  glad.c
+     Creating library C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.lib and object C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.exp
   Engine.vcxproj -> C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.dll

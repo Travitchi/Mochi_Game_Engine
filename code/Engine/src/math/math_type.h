@@ -78,3 +78,11 @@ typedef union vect4
 }vect4;
 
 typedef vect4 quat;
+
+typedef union mat4
+{
+	alignas(16) f32 data[16];
+#if defined (KUSE_SIMD)
+	alignas(16) vect4 rows[4];
+#endif
+}mat4;
