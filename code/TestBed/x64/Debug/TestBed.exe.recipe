@@ -2,10 +2,10 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.dll</FullPath>
+      <FullPath>C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\Engine.dll</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\TestBed.exe</FullPath>
+      <FullPath>C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\TestBed.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

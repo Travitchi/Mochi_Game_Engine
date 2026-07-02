@@ -12,7 +12,7 @@ M_obj_shader::M_obj_shader() {
 }
 
 void M_obj_shader::M_obj_shader_init(){
-    shader_id = create_shader_program("Engine/src/renderer/OpenGL/shaders/M_object_shader.vert", "Engine/src/renderer/OpenGL/shaders/M_object_shader.frag");
+    shader_id = create_shader_program("Assets/M_object_shader.vert", "Assets/M_object_shader.frag");
 
     if (shader_id == 0) {
         MERROR("Failed to build the Object Shader program.");

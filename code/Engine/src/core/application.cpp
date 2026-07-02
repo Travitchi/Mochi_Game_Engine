@@ -179,6 +179,7 @@ KAPI b8 application_run()
 	renderer_shutdown();
 
 	platform_shutdown(&app_state.platform);
+	shutdown_logging();
 
 	return TRUE;
 }
