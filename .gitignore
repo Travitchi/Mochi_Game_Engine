@@ -14,3 +14,6 @@ Release/
 *.recipe
 *.exp
 *.lib
+/code/.vs
+/code/Engine/x64/Debug
+/code/TestBed/x64/Debug
