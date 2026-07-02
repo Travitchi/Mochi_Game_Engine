@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>KEXPORT;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)src\core;$(ProjectDir)src\containers;$(SolutionDir)External\GLAD\include;$(ProjectDir)src;$(ProjectDir)src\Platform;$(ProjectDir)src\renderer;$(ProjectDir)src\renderer\OpenGL;$(ProjectDir)src\renderer\OpenGL\shaders;$(ProjectDir)src\math</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)External\SDL2\include;$(SolutionDir)External\GLAD\include;$(ProjectDir)src\core;$(ProjectDir)src\containers;$(ProjectDir)src;$(ProjectDir)src\Platform;$(ProjectDir)src\renderer;$(ProjectDir)src\renderer\OpenGL;$(ProjectDir)src\renderer\OpenGL\shaders;$(ProjectDir)src\math</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

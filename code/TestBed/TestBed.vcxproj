@@ -120,7 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)External\GLAD\include;$(SolutionDir)Engine\src;$(SolutionDir)Engine\src\core;$(SolutionDir)Engine\src\Platform;$(SolutionDir)Engine\src\containers;$(SolutionDir)Engine\src\math;$(SolutionDir)Engine\src\renderer;$(SolutionDir)Engine\src\renderer\OpenGL;$(SolutionDir)Engine\src\renderer\OpenGL\shaders</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)External\GLAD\include;$(SolutionDir)Engine\src;$(SolutionDir)Engine\src\core;$(SolutionDir)Engine\src\Platform;$(SolutionDir)Engine\src\containers;$(SolutionDir)Engine\src\math;$(SolutionDir)Engine\src\renderer;$(SolutionDir)Engine\src\renderer\OpenGL;$(SolutionDir)Engine\src\renderer\OpenGL\shaders;$(SolutionDir)External\SDL2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
