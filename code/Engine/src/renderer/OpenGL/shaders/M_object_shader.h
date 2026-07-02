@@ -14,6 +14,8 @@ typedef struct M_obj_shader
 	M_obj_shader();
 	~M_obj_shader();
 
+	void M_obj_shader_init();
+
 	//core pipeline functions
 	void M_obj_shader_use();
 

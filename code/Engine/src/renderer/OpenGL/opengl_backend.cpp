@@ -3,6 +3,15 @@
 #include <glad.h>
 #include <SDL.h>
 #include "Platform.h"
+#include "M_object_shader.h"
+
+
+typedef struct opengl_state
+{
+    M_obj_shader obj_shader;
+} opengl_state;
+
+static opengl_state* state_ptr;
 
 typedef struct sdl_internal_state {
     SDL_Window* window;
@@ -23,6 +32,17 @@ void APIENTRY opengl_debug_message_callback(GLenum source, GLenum type, GLuint i
 
 b8 opengl_backend_initialize(renderer_backend* backend, const char* application_name, struct platform_state* plat_state)
 {
+
+    state_ptr = (opengl_state*)Mallocate(sizeof(opengl_state), MEMORY_TAG_RENDERER);
+    Mzero_memory(state_ptr, sizeof(opengl_state));
+
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+    {
+        MERROR("Failed to initialize GLAD");
+        return FALSE;
+    }
+
+
     MINFO("OpenGL Backend successfully initialized!");
     //GPU INFO for troubleshooting
     const GLubyte* vendor = glGetString(GL_VENDOR);
@@ -40,14 +60,22 @@ b8 opengl_backend_initialize(renderer_backend* backend, const char* application_
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(opengl_debug_message_callback, NULL);
+
+    state_ptr->obj_shader.M_obj_shader_init();
     return TRUE;
 }
 
 //cleanup handled by platform_SDL2.cpp
 void opengl_backend_shutdown(renderer_backend* backend) 
 {
+    if (state_ptr) {
+        glDeleteProgram(state_ptr->obj_shader.shader_id);
+        Mfree(state_ptr, sizeof(opengl_state), MEMORY_TAG_RENDERER);
+        state_ptr = nullptr;
+    }
 
 }
+
 
 void opengl_backend_resized(renderer_backend* backend, u16 width, u16 height) 
 {

@@ -4,24 +4,29 @@
 #include "logger.h"
 
 //constructor and destructor
-M_obj_shader::M_obj_shader()
-{
-	//creates the shader program and get the uniform locations
-	shader_id = M_shader_utils::create_shader("Engine/src/renderer/OpenGL/shaders/M_object_shader.vert", "Engine/src/renderer/OpenGL/shaders/M_object_shader.frag");
-	
-	if (shader_id == 0) {
-		MERROR("Failed to build the Object Shader program.");
-		return; 
-	}
-
-	projection_location = glGetUniformLocation(shader_id, "projection");
-	view_location = glGetUniformLocation(shader_id, "view");
-	model_location = glGetUniformLocation(shader_id, "model");
-
-	if (projection_location == -1 || view_location == -1 || model_location == -1) {
-		MWARN("Object Shader: One or more matrix uniforms (projection, view, model) could not be found!");
-	}
+M_obj_shader::M_obj_shader() {
+	shader_id = 0;
+	projection_location = 0;
+	view_location = 0;
+	model_location = 0;
 }
+
+void M_obj_shader::M_obj_shader_init(){
+    shader_id = create_shader_program("Engine/src/renderer/OpenGL/shaders/M_object_shader.vert", "Engine/src/renderer/OpenGL/shaders/M_object_shader.frag");
+
+    if (shader_id == 0) {
+        MERROR("Failed to build the Object Shader program.");
+        return;
+    }
+
+    MINFO("Object Shader program successfully built and loaded.");
+
+    projection_location = glGetUniformLocation(shader_id, "projection");
+    view_location = glGetUniformLocation(shader_id, "view");
+    model_location = glGetUniformLocation(shader_id, "model");
+}
+
+
 
 M_obj_shader::~M_obj_shader()
 {
