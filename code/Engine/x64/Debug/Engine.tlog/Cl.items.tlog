@@ -11,3 +11,4 @@ C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\Platform\platform
 C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\renderer\OpenGL\opengl_backend.cpp;C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\x64\Debug\opengl_backend.obj
 C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\renderer\OpenGL\shaders\M_obj_shader.cpp;C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\x64\Debug\M_obj_shader.obj
 C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\renderer\renderer_frontend.cpp;C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\x64\Debug\renderer_frontend.obj
+C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\renderer\render_buffer.cpp;C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\x64\Debug\render_buffer.obj

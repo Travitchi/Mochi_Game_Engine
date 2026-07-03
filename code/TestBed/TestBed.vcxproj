@@ -158,6 +158,18 @@
   <ItemGroup>
     <ClInclude Include="src\game.h" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\bin\Debug\Assets\M_object_shader.frag">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\;%(DestinationFolders)</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Assets\;%(DestinationFolders)</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\bin\Debug\Assets\M_object_shader.vert">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Assets\;%(DestinationFolders)</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Assets\;%(DestinationFolders)</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

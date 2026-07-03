@@ -168,6 +168,7 @@
     <ClInclude Include="src\renderer\OpenGL\shaders\M_shader_utils.h" />
     <ClInclude Include="src\renderer\renderer_backend.h" />
     <ClInclude Include="src\renderer\renderer_frontend.h" />
+    <ClInclude Include="src\renderer\render_buffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\containers\darray.cpp" />
@@ -183,6 +184,7 @@
     <ClCompile Include="src\renderer\OpenGL\opengl_backend.cpp" />
     <ClCompile Include="src\renderer\OpenGL\shaders\M_obj_shader.cpp" />
     <ClCompile Include="src\renderer\renderer_frontend.cpp" />
+    <ClCompile Include="src\renderer\render_buffer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

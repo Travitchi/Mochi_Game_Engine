@@ -86,3 +86,20 @@ typedef union mat4
 	alignas(16) vect4 rows[4];
 #endif
 }mat4;
+
+
+//useful for buildings, terrains, stairs on a 3d rendering
+typedef struct vertex_3d
+{
+	vect3 position; // 3D position of the vertex
+	vect2 texture; //texture coordinates
+	vect3 normal; //normal vector for lighting calculations
+}vertex_3d;
+
+
+//structure for 2D vertices, useful for sprites and 2D rendering
+typedef struct vertex_2d
+{
+	vect2 position; 
+	vect2 textcoord; //texture coordinates spritesheet
+};

@@ -129,6 +129,15 @@ b8 platform_pump_messages(platform_state* plat_state) {
                 input_process_mouse_wheel(event.wheel.y);
             }
         } break;
+
+        case SDL_WINDOWEVENT: {
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED || event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+                event_context context;
+                context.data.u16[0] = (u16)event.window.data1;
+                context.data.u16[1] = (u16)event.window.data2;
+                event_fire(EVENT_CODE_RESIZED, 0, context);
+            }
+        } break;
         }
     }
 

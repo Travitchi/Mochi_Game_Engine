@@ -27,6 +27,7 @@ static application_state app_state;
 //event handlers
 b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context);
 b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context context);
+b8 application_on_resize(u16 code, void* sender, void* listener_inst, event_context context);
 
 
 KAPI b8 application_create(game* game_inst)
@@ -65,7 +66,7 @@ KAPI b8 application_create(game* game_inst)
 	event_register(EVENT_CODE_APPLICATION_QUIT, 0, application_on_event);
 	event_register(EVENT_CODE_KEY_RELEASED, 0, application_on_key);
 	event_register(EVENT_CODE_KEY_PRESSED, 0, application_on_key);
-
+	event_register(EVENT_CODE_RESIZED, 0, application_on_resize);
 
 	if (!platform_initialize(
 		&app_state.platform,
@@ -212,6 +213,25 @@ b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context
 
 			return TRUE;
 		}
+	}
+	return FALSE;
+}
+
+b8 application_on_resize(u16 code, void* sender, void* listener_inst, event_context context)
+{
+	if (code == EVENT_CODE_RESIZED)
+	{
+		u16 width = context.data.u16[0];
+		u16 height = context.data.u16[1];
+		if (width != app_state.width || height != app_state.height)
+		{
+			app_state.width = width;
+			app_state.height = height;
+			MINFO("Window resized to: %i x %i", width, height);
+			renderer_on_resize(width, height);
+			app_state.game_inst->on_resize(app_state.game_inst, width, height);
+		}
+		return TRUE;
 	}
 	return FALSE;
 }
