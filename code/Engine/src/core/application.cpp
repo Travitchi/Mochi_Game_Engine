@@ -87,6 +87,10 @@ KAPI b8 application_create(game* game_inst)
 		return FALSE;
 	}
 
+	app_state.width = game_inst->app_config.start_width;
+	app_state.height = game_inst->app_config.start_height;
+	renderer_on_resize(app_state.width, app_state.height);
+
 	//initialize game
 	if (!app_state.game_inst->initialize(app_state.game_inst))
 	{

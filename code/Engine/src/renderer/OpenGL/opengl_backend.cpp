@@ -10,6 +10,7 @@
 typedef struct opengl_state
 {
     M_obj_shader obj_shader;
+    mat4 projection;
     render_buffer object_vertex_buffer;
     render_buffer object_index_buffer;
     u64 geometry_vertex_offset;
@@ -158,6 +159,12 @@ void opengl_backend_resized(renderer_backend* backend, u16 width, u16 height)
 {
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
+
+    if (height != 0)
+    {
+        f32 aspect = (f32)width / (f32)height;
+        state_ptr->projection = mat4_orthographic(-aspect, aspect, 1.0f, -1.0f, -1.0f, 1.0f);
+    }
 }
 
 b8 opengl_backend_begin_frame(renderer_backend* backend, f32 delta_time) 
@@ -176,9 +183,10 @@ b8 opengl_backend_begin_frame(renderer_backend* backend, f32 delta_time)
     //Activate the Shader
     state_ptr->obj_shader.M_obj_shader_use();
 
-    mat4 id = mat4_id();
-    state_ptr->obj_shader.update_glob_state(id, id);
-    state_ptr->obj_shader.update_object_state(id);
+    mat4 view = mat4_id();
+    mat4 model = mat4_id();
+    state_ptr->obj_shader.update_glob_state(state_ptr->projection, view);
+    state_ptr->obj_shader.update_object_state(model);
 
     // automatically binds the vertex & index buffers
     glBindVertexArray(state_ptr->master_vao);
