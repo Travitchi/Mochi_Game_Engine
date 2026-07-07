@@ -30,8 +30,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="..\bin\Debug\Assets\M_object_shader.vert" />
-    <CopyFileToFolders Include="..\bin\Debug\Assets\M_object_shader.frag" />
-  </ItemGroup>
 </Project>

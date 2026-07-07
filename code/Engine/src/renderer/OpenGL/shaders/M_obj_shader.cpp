@@ -2,17 +2,19 @@
 #include <glad.h>
 #include "M_shader_utils.h"
 #include "logger.h"
+#include "render_buffer.h"
+
+
 
 //constructor and destructor
 M_obj_shader::M_obj_shader() {
 	shader_id = 0;
-	projection_location = 0;
-	view_location = 0;
-	model_location = 0;
+    model_location = 0;
+    normal_location = 0;
 }
 
 void M_obj_shader::M_obj_shader_init(){
-    shader_id = create_shader_program("Assets/M_object_shader.vert", "Assets/M_object_shader.frag");
+    shader_id = create_shader_program("M_object_shader.vert", "M_object_shader.frag");
 
     if (shader_id == 0) {
         MERROR("Failed to build the Object Shader program.");
@@ -21,9 +23,9 @@ void M_obj_shader::M_obj_shader_init(){
 
     MINFO("Object Shader program successfully built and loaded.");
 
-    projection_location = glGetUniformLocation(shader_id, "projection");
-    view_location = glGetUniformLocation(shader_id, "view");
-    model_location = glGetUniformLocation(shader_id, "model");
+    
+    model_location = glGetUniformLocation(shader_id, "u_push.model");
+    normal_location = glGetUniformLocation(shader_id, "u_push.normal_matrix");
 }
 
 
@@ -41,15 +43,18 @@ void M_obj_shader::M_obj_shader_use()
 }
 
 //updates the shader on the obj in case we move with our camera
-void M_obj_shader::update_glob_state(mat4 projection, mat4 view)
+void M_obj_shader::update_glob_state(render_buffer* global_ubo, mat4 projection, mat4 view)
 {
-	glUniformMatrix4fv(projection_location, 1, GL_FALSE, projection.data);
-	glUniformMatrix4fv(view_location, 1, GL_FALSE, view.data);
+    render_buffer_load_data(global_ubo, 0, sizeof(mat4), projection.data);
+    render_buffer_load_data(global_ubo, sizeof(mat4), sizeof(mat4), view.data);
 }
 
-//sends the model matrix to the shader to update the object state
-void M_obj_shader::update_object_state(mat4 model)
+// sends the model matrix to the shader to update the object state
+void M_obj_shader::update_object_state(mat4 model, mat4 normal_matrix)
 {
-	glUniformMatrix4fv(model_location, 1, GL_FALSE, model.data);
+    glUniformMatrix4fv(model_location, 1, GL_FALSE, model.data);
+
+    glUniformMatrix4fv(normal_location, 1, GL_FALSE, normal_matrix.data);
 }
+
 

@@ -457,7 +457,7 @@ MINLINE mat4 mat4_mult(mat4 matrix1, mat4 matrix2)
 
 	for (i32 i = 0; i < 4; ++i)
 	{
-		for (i32 j; j < 4; ++j)
+		for (i32 j = 0; j < 4; ++j)
 		{
 			*dst_ptr = m1_ptr[0] * m2_ptr[0 + j] + m1_ptr[1] * m2_ptr[4 + j] + m1_ptr[2] * m2_ptr[8 + j] + m1_ptr[3] * m2_ptr[12 + j];
 			dst_ptr++;

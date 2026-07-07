@@ -1,39 +1,25 @@
 ﻿  application.cpp
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/core/application.cpp')
   
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/core/application.cpp')
   
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/core/application.cpp')
   
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   (compiling source file 'src/core/application.cpp')
   
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\application.cpp(12,16): warning C4091: 'typedef ': ignored on left of 'application_state' when no variable is declared
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\application.cpp(148,24): warning C4244: '=': conversion from 'f64' to 'f32', possible loss of data
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\application.cpp(158,22): warning C4244: 'initializing': conversion from 'f64' to 'u64', possible loss of data
-  opengl_backend.cpp
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\math\math_type.h(105,2): warning C4091: 'typedef ': ignored on left of 'vertex_2d' when no variable is declared
+  (compiling source file 'src/core/application.cpp')
   
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
-  
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
-  
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
-  
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\math\math_type.h(101,16): warning C4091: 'typedef ': ignored on left of 'vertex_2d' when no variable is declared
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
-  
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\math\M_math.h(6,9): warning C4005: 'M_PI': macro redefinition
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
-      C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\External\SDL2\include\SDL_stdinc.h(638,9):
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\math\M_math.h(6,1): warning C4005: 'M_PI': macro redefinition
+  (compiling source file 'src/core/application.cpp')
+      C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\External\SDL2\include\SDL_stdinc.h(638,1):
       see previous definition of 'M_PI'
   
-  Generating Code...
-  Engine.vcxproj -> C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\Engine.dll
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(37,2): warning C4091: 'typedef ': ignored on left of 'application_state' when no variable is declared
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(199,24): warning C4244: '=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(209,22): warning C4244: 'initializing': conversion from 'f64' to 'u64', possible loss of data
+  Engine.vcxproj -> C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.dll

@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>KEXPORT;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)External\SDL2\include;$(SolutionDir)External\GLAD\include;$(ProjectDir)src\core;$(ProjectDir)src\containers;$(ProjectDir)src;$(ProjectDir)src\Platform;$(ProjectDir)src\renderer;$(ProjectDir)src\renderer\OpenGL;$(ProjectDir)src\renderer\OpenGL\shaders;$(ProjectDir)src\math</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)External\SDL2\include;$(SolutionDir)External\GLAD\include;$(ProjectDir)src\core;$(ProjectDir)src\containers;$(ProjectDir)src\vendor;$(ProjectDir)src\systems;$(ProjectDir)src;$(ProjectDir)src\Platform;$(ProjectDir)src\renderer;$(ProjectDir)src\renderer\OpenGL;$(ProjectDir)src\renderer\OpenGL\shaders;$(ProjectDir)src\math;$(ProjectDir)src\resources;$(ProjectDir)src\resources\loaders</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\containers\darray.h" />
+    <ClInclude Include="src\containers\hashtable.h" />
     <ClInclude Include="src\core\application.h" />
     <ClInclude Include="src\core\asserts.h" />
     <ClInclude Include="src\core\clock.h" />
@@ -164,14 +165,24 @@
     <ClInclude Include="src\math\M_math.h" />
     <ClInclude Include="src\Platform\Platform.h" />
     <ClInclude Include="src\renderer\OpenGL\opengl_backend.h" />
+    <ClInclude Include="src\renderer\OpenGL\opengl_image.h" />
     <ClInclude Include="src\renderer\OpenGL\shaders\M_object_shader.h" />
     <ClInclude Include="src\renderer\OpenGL\shaders\M_shader_utils.h" />
     <ClInclude Include="src\renderer\renderer_backend.h" />
     <ClInclude Include="src\renderer\renderer_frontend.h" />
     <ClInclude Include="src\renderer\render_buffer.h" />
+    <ClInclude Include="src\resources\loaders\image_loader.h" />
+    <ClInclude Include="src\resources\loaders\material_loader.h" />
+    <ClInclude Include="src\resources\loaders\text_loader.h" />
+    <ClInclude Include="src\resources\resource_types.h" />
+    <ClInclude Include="src\systems\geometry_systems.h" />
+    <ClInclude Include="src\systems\material_systems.h" />
+    <ClInclude Include="src\systems\resource_systems.h" />
+    <ClInclude Include="src\systems\texture_systems.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\containers\darray.cpp" />
+    <ClCompile Include="src\containers\hashtable.cpp" />
     <ClCompile Include="src\core\application.cpp" />
     <ClCompile Include="src\core\clock.cpp" />
     <ClCompile Include="src\core\event.cpp" />
@@ -182,9 +193,17 @@
     <ClCompile Include="src\Platform\glad.c" />
     <ClCompile Include="src\Platform\platform_SDL2.cpp" />
     <ClCompile Include="src\renderer\OpenGL\opengl_backend.cpp" />
+    <ClCompile Include="src\renderer\OpenGL\opengl_image.cpp" />
     <ClCompile Include="src\renderer\OpenGL\shaders\M_obj_shader.cpp" />
     <ClCompile Include="src\renderer\renderer_frontend.cpp" />
     <ClCompile Include="src\renderer\render_buffer.cpp" />
+    <ClCompile Include="src\resources\loaders\image_loader.cpp" />
+    <ClCompile Include="src\resources\loaders\material_loader.cpp" />
+    <ClCompile Include="src\resources\loaders\text_loader.cpp" />
+    <ClCompile Include="src\systems\geometry_systems.cpp" />
+    <ClCompile Include="src\systems\material_systems.cpp" />
+    <ClCompile Include="src\systems\resource_systems.cpp" />
+    <ClCompile Include="src\systems\texture_systems.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

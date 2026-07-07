@@ -1,15 +1,23 @@
 #pragma once
 #include "defines.hpp"
 
+typedef enum render_buffer_type
+{
+	RENDER_BUFFER_TYPE_VERTEX,
+	RENDER_BUFFER_TYPE_INDEX,
+	RENDER_BUFFER_TYPE_UNIFORM
+} render_buffer_type;
+
 typedef struct render_buffer
 {
 	u32 buffer_id;
 	u64 total_size;
 	u64 stride; //size of a single elemnent
+	render_buffer_type type;
 } render_buffer;
 
 
-b8 render_buffer_create(render_buffer* buffer, u64 total_size, u64 stride);
+b8 render_buffer_create(render_buffer* buffer, render_buffer_type type, u64 total_size, u64 stride);
 void render_buffer_destroy(render_buffer* buffer);
 
 //tells the gpu the specific buffer to use

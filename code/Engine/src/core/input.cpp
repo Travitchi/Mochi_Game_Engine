@@ -128,7 +128,7 @@ b8 input_was_key_pressed(keys key)
 	return state.keyboard_previous.keys[key] == TRUE;
 }
 
-b8 input_was_key_release(keys key)
+b8 input_was_key_released(keys key)
 {
 	if (!initialized)
 	{

@@ -1,6 +1,6 @@
 #include "application.h"
 #include "game_types.h"
-#include <Platform/Platform.h>	
+#include "Platform.h"
 #include "logger.h"
 #include "M_memory.h"
 #include "event.h"
@@ -8,6 +8,13 @@
 #include "SDL.h"
 #include "clock.h"
 #include "renderer_frontend.h"
+#include "texture_systems.h"
+#include "material_systems.h"
+#include "geometry_systems.h"
+#include "resource_systems.h"
+#include "image_loader.h"
+#include "text_loader.h"
+#include "material_loader.h"
 
 typedef struct application_state
 {
@@ -19,6 +26,14 @@ typedef struct application_state
 	i16 height;
 	clock clock;
 	f64 last_time;
+	u64 texture_system_memory_requirement;
+	void* texture_system_state_memory;
+	u64 material_system_memory_requirement;
+	void* material_system_state_memory;
+	u64 resource_system_memory_requirement;
+	void* resource_system_state_memory;
+	u64 geometry_system_memory_requirement;
+	void* geometry_system_state_memory;
 };
 
 static b8 initialized = FALSE;  //safety check
@@ -80,6 +95,18 @@ KAPI b8 application_create(game* game_inst)
 		return FALSE;
 	}
 
+	//resource system startup
+	resource_system_config res_config = {};
+	res_config.max_loader_count = 32;
+	res_config.asset_base_path = "../../Assets";
+	u64 res_sys_memory_req = 0;
+	resource_system_initialize(&res_sys_memory_req, 0, res_config);
+	app_state.resource_system_state_memory = Mallocate(res_sys_memory_req, MEMORY_TAG_APPLICATION);
+	resource_system_initialize(&res_sys_memory_req, app_state.resource_system_state_memory, res_config);
+	resource_system_register_loader(image_resource_loader_create());
+	resource_system_register_loader(text_resource_loader_create());
+	resource_system_register_loader(material_resource_loader_create());
+
 	//renderer startup
 	if (!renderer_initialize(game_inst->app_config.name, &app_state.platform)) 
 	{
@@ -87,6 +114,30 @@ KAPI b8 application_create(game* game_inst)
 		return FALSE;
 	}
 
+
+	//texture system startup
+	texture_system_config tex_config;
+	tex_config.max_texture_count = 65536;
+	texture_system_initialize(&app_state.texture_system_memory_requirement, 0, tex_config);
+	app_state.texture_system_state_memory = Mallocate(app_state.texture_system_memory_requirement, MEMORY_TAG_APPLICATION);
+	texture_system_initialize(&app_state.texture_system_memory_requirement, app_state.texture_system_state_memory, tex_config);
+
+	//material system startup
+	material_system_config mat_config;
+	mat_config.max_material_count = 4096;
+	u64 mat_sys_memory_req = 0;
+	material_system_initialize(&mat_sys_memory_req, 0, mat_config);
+	void* mat_sys_state = Mallocate(mat_sys_memory_req, MEMORY_TAG_APPLICATION);
+	material_system_initialize(&mat_sys_memory_req, mat_sys_state, mat_config);
+
+	//geometry system startup
+	geometry_system_config geo_config = { 4096 };
+	u64 geo_sys_mem_req = 0;
+	geometry_system_initialize(&geo_sys_mem_req, 0, geo_config);
+	void* geo_sys_state = Mallocate(geo_sys_mem_req, MEMORY_TAG_APPLICATION);
+	geometry_system_initialize(&geo_sys_mem_req, geo_sys_state, geo_config);
+
+	//set initial window size
 	app_state.width = game_inst->app_config.start_width;
 	app_state.height = game_inst->app_config.start_height;
 	renderer_on_resize(app_state.width, app_state.height);
@@ -182,7 +233,10 @@ KAPI b8 application_run()
 	event_shutdown();
 	input_shutdown();
 	renderer_shutdown();
-
+	geometry_system_shutdown(app_state.geometry_system_state_memory);
+	material_system_shutdown(app_state.material_system_state_memory);
+	texture_system_shutdown(app_state.texture_system_state_memory);
+	resource_system_shutdown(app_state.resource_system_state_memory);
 	platform_shutdown(&app_state.platform);
 	shutdown_logging();
 
