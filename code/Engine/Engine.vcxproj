@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\containers\darray.h" />
+    <ClInclude Include="src\containers\freelist.h" />
     <ClInclude Include="src\containers\hashtable.h" />
     <ClInclude Include="src\core\application.h" />
     <ClInclude Include="src\core\asserts.h" />
@@ -183,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\containers\darray.cpp" />
+    <ClCompile Include="src\containers\freelist.cpp" />
     <ClCompile Include="src\containers\hashtable.cpp" />
     <ClCompile Include="src\core\application.cpp" />
     <ClCompile Include="src\core\clock.cpp" />

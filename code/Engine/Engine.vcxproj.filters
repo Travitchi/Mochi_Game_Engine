@@ -111,6 +111,9 @@
     <ClInclude Include="src\renderer\OpenGL\shaders\M_ui_shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\containers\freelist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\logger.cpp">
@@ -183,6 +186,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\renderer\OpenGL\shaders\M_ui_shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\containers\freelist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

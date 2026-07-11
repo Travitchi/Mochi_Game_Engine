@@ -1,30 +1,15 @@
-﻿  opengl_backend.cpp
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
+﻿  freelist.cpp
+C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/containers/freelist.cpp')
   
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
+C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/containers/freelist.cpp')
   
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
+C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/containers/freelist.cpp')
   
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/renderer/OpenGL/opengl_backend.cpp')
+C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/containers/freelist.cpp')
   
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\renderer\OpenGL\opengl_backend.cpp(328,52): warning C4244: '=': conversion from 'u64' to 'u32', possible loss of data
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\renderer\OpenGL\opengl_backend.cpp(329,51): warning C4244: '=': conversion from 'u64' to 'u32', possible loss of data
-  texture_systems.cpp
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/systems/texture_systems.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/systems/texture_systems.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/systems/texture_systems.cpp')
-  
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/systems/texture_systems.cpp')
-  
-  Generating Code...
-  Engine.vcxproj -> C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.dll
+     Creating library C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\Engine.lib and object C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\Engine.exp
+  Engine.vcxproj -> C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\Engine.dll
