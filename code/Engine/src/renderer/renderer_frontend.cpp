@@ -57,7 +57,10 @@ b8 renderer_initialize(const char* application_name, struct platform_state* plat
     backend->resized = opengl_backend_resized;
     backend->begin_frame = opengl_backend_begin_frame;
     backend->end_frame = opengl_backend_end_frame;
-    backend->update_global_state = opengl_backend_update_global_state;
+    backend->update_global_world_state = opengl_backend_update_global_world_state;
+    backend->update_global_ui_state = opengl_backend_update_global_ui_state;
+    backend->begin_render_pass = opengl_backend_begin_render_pass;
+    backend->end_render_pass = opengl_backend_end_render_pass;
     backend->update_object = opengl_backend_update_object;
     backend->set_projection_params = opengl_backend_set_projection_params;
     backend->set_view = opengl_backend_set_view;
@@ -102,46 +105,6 @@ void renderer_set_view(mat4 view)
     }
 }
 
-b8 renderer_draw_frame(render_packet* packet)
-{
-    if (backend->begin_frame(backend, packet->delta_time))
-    {
-		//test rotation
-        if (backend->update_global_state)
-        {
-            backend->update_global_state(backend, mat4_id(), mat4_id());
-        }
-
-        if (backend->update_object) 
-        {
-            mat4 translation = mat4_translation(vect3{ 0.0f, -2.0f, -10.0f });
-            geometry_render_data data = {};
-
-            if (!test_geometry) 
-            {
-                geometry_config plane_config = geometry_system_generate_plane_config(10.0f, 5.0f, 5, 5, 2.0f, 2.0f, "test_plane", "test_mat_1");
-                test_geometry = geometry_system_acquire_from_config(plane_config, TRUE);
-                Mfree(plane_config.vertices, plane_config.vertex_size, MEMORY_TAG_ARRAY);
-                Mfree(plane_config.indices, plane_config.index_size, MEMORY_TAG_ARRAY);
-            }
-            data.geometry = test_geometry;
-            data.model = translation;
-            backend->update_object(backend, data);
-        }
-
-        b8 result = backend->end_frame(backend, packet->delta_time);
-        if (!result)
-        {
-            MERROR("renderer_end_frame failed. Shutting down.");
-            return FALSE;
-        }
-
-        backend->frame_number++;
-    }
-
-    return TRUE;
-}
-
 void renderer_create_texture(const char* name, b8 auto_release, i32 width, i32 height, i32 channel_count, const u8* pixels, b8 has_transparency, texture* out_texture)
 {
     if (backend && backend->create_texture) {
@@ -156,11 +119,11 @@ void renderer_destroy_texture(texture* texture)
     }
 }
 
-void renderer_create_geometry(geometry* geometry, u32 vertex_count, const void* vertices, u32 index_count, const void* indices)
+void renderer_create_geometry(geometry* geometry, u32 vertex_size, u32 vertex_count, const void* vertices, u32 index_size, u32 index_count, const void* indices)
 {
-    if (backend && backend->create_geometry) 
+    if (backend && backend->create_geometry)
     {
-        backend->create_geometry(backend, geometry, vertex_count, vertices, index_count, indices);
+        backend->create_geometry(backend, geometry, vertex_size, vertex_count, vertices, index_size, index_count, indices);
     }
 }
 
@@ -169,5 +132,69 @@ void renderer_destroy_geometry(geometry* geometry)
     if (backend && backend->destroy_geometry) 
     {
         backend->destroy_geometry(backend, geometry);
+    }
+}
+
+b8 renderer_begin_render_pass(u8 pass_id)
+{
+    return backend->begin_render_pass(backend, pass_id);
+}
+
+void renderer_end_render_pass(u8 pass_id)
+{
+    backend->end_render_pass(backend, pass_id);
+}
+
+b8 renderer_begin_frame(render_packet* packet)
+{
+    if (!backend) return FALSE;
+    return backend->begin_frame(backend, packet->delta_time);
+}
+
+b8 renderer_end_frame(render_packet* packet)
+{
+    if (!backend) return FALSE;
+    b8 result = backend->end_frame(backend, packet->delta_time);
+    backend->frame_number++;
+    return result;
+}
+
+void renderer_draw_geometry(geometry_render_data data)
+{
+    if (backend && backend->update_object)
+    {
+        backend->update_object(backend, data);
+    }
+}
+
+void renderer_update_global_ui_state(mat4 projection, mat4 view)
+{
+    if (backend && backend->update_global_ui_state)
+    {
+        backend->update_global_ui_state(backend, projection, view);
+    }
+}
+
+void renderer_draw_test_geometry()
+{
+    if (backend && backend->update_object)
+    {
+        if (backend->update_global_world_state)
+        {
+            backend->update_global_world_state(backend, mat4_id(), mat4_id());
+        }
+
+        mat4 translation = mat4_translation(vect3{ 0.0f, -2.0f, -10.0f });
+        geometry_render_data data = {};
+        if (!test_geometry)
+        {
+            geometry_config plane_config = geometry_system_generate_plane_config(10.0f, 5.0f, 5, 5, 2.0f, 2.0f, "test_plane", "test_mat_1");
+            test_geometry = geometry_system_acquire_from_config(plane_config, TRUE);
+            Mfree(plane_config.vertices, plane_config.vertex_size * plane_config.vertex_count, MEMORY_TAG_ARRAY);
+            Mfree(plane_config.indices, plane_config.index_size * plane_config.index_count, MEMORY_TAG_ARRAY);
+        }
+        data.geometry = test_geometry;
+        data.model = translation;
+        backend->update_object(backend, data);
     }
 }

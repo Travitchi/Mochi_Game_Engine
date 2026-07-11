@@ -2,6 +2,12 @@
 #include "defines.hpp"
 #include "M_math.h"
 
+typedef enum material_type 
+{
+    MATERIAL_TYPE_WORLD = 0,
+    MATERIAL_TYPE_UI = 1
+} material_type;
+
 typedef struct texture
 {
     u32 id;
@@ -30,6 +36,7 @@ typedef struct material
 {
     u32 id;
     u32 generation;
+    material_type type;
     u32 internal_id;
     char name[256];
     vect4 diffuse_color;
@@ -39,6 +46,7 @@ typedef struct material
 typedef struct material_config 
 {
     char name[256];
+    material_type type;
     b8 auto_release;
     vect4 diffuse_color;
     char diffuse_map_name[256];

@@ -61,3 +61,10 @@ STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes.");
 #define MINLINE static inline
 #define MNOINLINE
 #endif
+
+
+typedef enum builtin_render_pass 
+{
+    BUILTIN_RENDER_PASS_WORLD = 0x01,
+    BUILTIN_RENDER_PASS_UI = 0x02
+} builtin_render_pass;

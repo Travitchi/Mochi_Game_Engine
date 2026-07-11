@@ -86,10 +86,14 @@ void texture_system_shutdown(void* state)
 
 texture* texture_system_acquire(const char* name, b8 auto_release) 
 {
-    static texture hot_texture = {};
-    if (load_texture(name, &hot_texture)) {
-        return &hot_texture;
+    static u32 texture_count = 0;
+    texture* new_texture = &state_ptr->registered_textures[texture_count];
+    if (load_texture(name, new_texture))
+    {
+        texture_count++;
+        return new_texture;
     }
+
     return &state_ptr->default_texture;
 }
 

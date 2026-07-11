@@ -39,9 +39,6 @@ void camera_pitch(game_state* state, f32 amount)
 	camera_recalculate_view_matrix(state);
 }
 
-// =========================================================================
-// NEW: CAMERA TRANSLATION (WALKING / FLYING)
-// =========================================================================
 void camera_move_forward(game_state* state, f32 amount) {
 	mat4 rotation = mat4_eulero_xyz(state->camera_euler.x, state->camera_euler.y, state->camera_euler.z);
 	vect3 forward = mat4_forward(rotation);
@@ -65,7 +62,6 @@ void camera_move_up(game_state* state, f32 amount) {
 
 b8 game_initialize(game* game_inst)
 {
-	//remove when not debugging
 	MDEBUG("game_initialize called!");
 	//test hack
 	game_state* state = (game_state*)game_inst->state;

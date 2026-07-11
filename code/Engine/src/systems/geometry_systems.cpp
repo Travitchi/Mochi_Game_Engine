@@ -11,6 +11,8 @@ typedef struct geometry_system_state
     geometry_system_config config;
     geometry default_geometry;
     geometry hot_geometry;
+    geometry registered_geometries[1024];
+    u32 geometry_count;
 } geometry_system_state;
 
 static geometry_system_state* state_ptr = 0;
@@ -28,9 +30,9 @@ b8 geometry_system_initialize(u64* memory_requirement, void* state, geometry_sys
     state_ptr->default_geometry.id = 0;
     strcpy_s(state_ptr->default_geometry.name, 256, def_config.name);
     state_ptr->default_geometry.material = material_system_get_default();
-    renderer_create_geometry(&state_ptr->default_geometry, def_config.vertex_count, def_config.vertices, def_config.index_count, def_config.indices);
-    Mfree(def_config.vertices, def_config.vertex_size, MEMORY_TAG_ARRAY);
-    Mfree(def_config.indices, def_config.index_size, MEMORY_TAG_ARRAY);
+    renderer_create_geometry(&state_ptr->default_geometry, def_config.vertex_size, def_config.vertex_count, def_config.vertices, def_config.index_size, def_config.index_count, def_config.indices);
+    Mfree(def_config.vertices, def_config.vertex_size * def_config.vertex_count, MEMORY_TAG_ARRAY);
+    Mfree(def_config.indices, def_config.index_size * def_config.index_count, MEMORY_TAG_ARRAY);
 
     return TRUE;
 }
@@ -46,19 +48,21 @@ void geometry_system_shutdown(void* state)
 
 geometry* geometry_system_acquire_from_config(geometry_config config, b8 auto_release) 
 {
-    strcpy_s(state_ptr->hot_geometry.name, 256, config.name);
-    if (strlen(config.material_name) > 0) 
+    geometry* new_geom = &state_ptr->registered_geometries[state_ptr->geometry_count++];
+
+    strcpy_s(new_geom->name, 256, config.name);
+    if (strlen(config.material_name) > 0)
     {
-        state_ptr->hot_geometry.material = material_system_acquire(config.material_name);
+        new_geom->material = material_system_acquire(config.material_name);
     }
-    else 
+    else
     {
-        state_ptr->hot_geometry.material = material_system_get_default();
+        new_geom->material = material_system_get_default();
     }
 
-    renderer_create_geometry(&state_ptr->hot_geometry, config.vertex_count, config.vertices, config.index_count, config.indices);
+    renderer_create_geometry(new_geom, config.vertex_size, config.vertex_count, config.vertices, config.index_size, config.index_count, config.indices);
 
-    return &state_ptr->hot_geometry;
+    return new_geom;
 }
 
 void geometry_system_release(geometry* geometry) 
@@ -80,12 +84,12 @@ geometry_config geometry_system_generate_plane_config(f32 width, f32 height, u32
     if (y_segment_count == 0) y_segment_count = 1;
 
     config.vertex_count = x_segment_count * y_segment_count * 4;
-    config.vertex_size = sizeof(vertex_3d) * config.vertex_count;
-    config.vertices = Mallocate(config.vertex_size, MEMORY_TAG_ARRAY);
+    config.vertex_size = sizeof(vertex_3d);
+    config.vertices = Mallocate(config.vertex_size * config.vertex_count, MEMORY_TAG_ARRAY);
 
     config.index_count = x_segment_count * y_segment_count * 6;
-    config.index_size = sizeof(u32) * config.index_count;
-    config.indices = Mallocate(config.index_size, MEMORY_TAG_ARRAY);
+    config.index_size = sizeof(u32);
+    config.indices = Mallocate(config.index_size * config.index_count, MEMORY_TAG_ARRAY);
 
     strcpy_s(config.name, 256, name);
     strcpy_s(config.material_name, 256, material_name);

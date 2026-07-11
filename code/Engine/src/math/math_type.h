@@ -101,5 +101,5 @@ typedef struct vertex_3d
 typedef struct vertex_2d
 {
 	vect2 position; 
-	vect2 textcoord; //texture coordinates spritesheet
-};
+	vect2 texcoord; //texture coordinates spritesheet
+}vertex_2d;

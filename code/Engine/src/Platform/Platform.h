@@ -26,7 +26,3 @@ void platform_console_write_error(const char* message, u8 colour);
 // Timing functions
 f64 platform_get_absolute_time();
 void platform_sleep(u64 ms); //ms = milliseconds
-
-
-
-

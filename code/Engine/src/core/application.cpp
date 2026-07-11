@@ -15,6 +15,7 @@
 #include "image_loader.h"
 #include "text_loader.h"
 #include "material_loader.h"
+#include <string.h>
 
 typedef struct application_state
 {
@@ -166,6 +167,32 @@ KAPI b8 application_run()
 
 	MINFO(get_memory_usage_str());
 
+
+	mat4 ui_projection = mat4_orthographic(0.0f, (f32)app_state.width, (f32)app_state.height, 0.0f, -100.0f, 100.0f);
+	mat4 ui_view = mat4_id();
+
+
+	vertex_2d ui_verts[4] = {
+		{ {0.0f,   0.0f},   {0.0f, 1.0f} },
+		{ {512.0f, 0.0f},   {1.0f, 1.0f} },
+		{ {512.0f, 512.0f}, {1.0f, 0.0f} },
+		{ {0.0f,   512.0f}, {0.0f, 0.0f} }
+	};
+	u32 ui_indices[6] = { 2, 1, 0, 3, 2, 0 };
+
+	geometry_config ui_config = {};
+	ui_config.vertex_size = sizeof(vertex_2d);
+	ui_config.vertex_count = 4;
+	ui_config.vertices = ui_verts;
+	ui_config.index_size = sizeof(u32);
+	ui_config.index_count = 6;
+	ui_config.indices = ui_indices;
+	strcpy_s(ui_config.name, 256, "test_ui_geom");
+	strcpy_s(ui_config.material_name, 256, "test_ui_material");
+
+	geometry_render_data my_ui_image = {};
+	my_ui_image.geometry = geometry_system_acquire_from_config(ui_config, TRUE);
+	my_ui_image.model = mat4_translation(vect3_create(10.0f, 10.0f, 0.0f));
 	while (app_state.is_run)
 	{
 		
@@ -195,9 +222,31 @@ KAPI b8 application_run()
 			}
 
 			//todo: refactor packet creation
-			render_packet packet;
+			render_packet packet = {};
 			packet.delta_time = delta;
-			renderer_draw_frame(&packet);
+			packet.geometry_count = 0;
+			packet.ui_geometry_count = 0;
+
+			vertex_2d ui_verts[4] = {{ {0.0f,   0.0f},   {0.0f, 1.0f} },{ {100.0f, 0.0f},   {1.0f, 1.0f} },{ {100.0f, 100.0f}, {1.0f, 0.0f} },{ {0.0f,   100.0f}, {0.0f, 0.0f} }};
+			u32 ui_indices[6] = { 2, 1, 0, 3, 2, 0 };
+
+			if (renderer_begin_frame(&packet))
+			{
+				if (renderer_begin_render_pass(BUILTIN_RENDER_PASS_WORLD))
+				{
+					renderer_draw_test_geometry();
+					renderer_end_render_pass(BUILTIN_RENDER_PASS_WORLD);
+				}
+
+				if (renderer_begin_render_pass(BUILTIN_RENDER_PASS_UI))
+				{
+					renderer_update_global_ui_state(ui_projection, ui_view);
+					renderer_draw_geometry(my_ui_image);
+					renderer_end_render_pass(BUILTIN_RENDER_PASS_UI);
+				}
+
+				renderer_end_frame(&packet);
+			}
 
 			f64 frame_end_time = platform_get_absolute_time();
 			f64 frame_elapsed_time = frame_end_time - frame_start_time;

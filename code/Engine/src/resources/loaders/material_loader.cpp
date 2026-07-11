@@ -43,6 +43,11 @@ b8 material_loader_load(const char* name, void* loader, resource* out_resource)
         {
             sscanf_s(value.c_str(), "%f %f %f %f", &config->diffuse_color.x, &config->diffuse_color.y, &config->diffuse_color.z, &config->diffuse_color.w);
         }
+        else if (key == "type")
+        {
+            if (value == "ui") config->type = MATERIAL_TYPE_UI;
+            else config->type = MATERIAL_TYPE_WORLD;
+        }
     }
     file.close();
 
