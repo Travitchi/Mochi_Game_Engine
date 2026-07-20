@@ -12,6 +12,7 @@
 #include "material_systems.h"
 #include "geometry_systems.h"
 #include "resource_systems.h"
+#include "light_system.h"
 #include "image_loader.h"
 #include "text_loader.h"
 #include "material_loader.h"
@@ -127,12 +128,21 @@ KAPI b8 application_create(game* game_inst)
 		return FALSE;
 	}
 
+	//light system startup
+	if (!light_system_initialize())
+	{
+		MFATAL("Failed to initialize light system.");
+		return FALSE;
+	}
+	//test lights
+	light_system_add_point_light(vect4_create(0.0f, 1.0f, 0.0f, 1.0f), vect3_create(15.0f, 5.0f, -15.0f), 1.0f, 0.09f, 0.032f);
+	light_system_add_point_light(vect4_create(5.0f, 0.0f, 0.0f, 1.0f), vect3_create(-15.0f, 5.0f, -15.0f), 1.0f, 0.09f, 0.032f);
 
 	//texture system startup
 	texture_system_config tex_config;
 	tex_config.max_texture_count = 65536;
 	texture_system_initialize(&app_state.texture_system_memory_requirement, 0, tex_config);
-	app_state.texture_system_state_memory = Mallocate(app_state.texture_system_memory_requirement, MEMORY_TAG_APPLICATION);
+	app_state.texture_system_state_memory = Mallocate(app_state.texture_system_memory_requirement, MEMORY_TAG_RENDERER);
 	texture_system_initialize(&app_state.texture_system_memory_requirement, app_state.texture_system_state_memory, tex_config);
 
 	//shader system startup
@@ -140,8 +150,8 @@ KAPI b8 application_create(game* game_inst)
 	shader_config.max_shader_count = 1024;
 	u64 shader_sys_memory_req = 0;
 	shader_system_initialize(&shader_sys_memory_req, 0, shader_config);
-	void* shader_sys_state = Mallocate(shader_sys_memory_req, MEMORY_TAG_APPLICATION);
-	app_state.shader_system_state_memory = Mallocate(shader_sys_memory_req, MEMORY_TAG_APPLICATION);
+	void* shader_sys_state = Mallocate(shader_sys_memory_req, MEMORY_TAG_RENDERER);
+	app_state.shader_system_state_memory = Mallocate(shader_sys_memory_req, MEMORY_TAG_RENDERER);
 	shader_system_initialize(&shader_sys_memory_req, shader_sys_state, shader_config);
 	resource obj_shader_res;
 	if (resource_system_load("M_object_shader", RESOURCE_TYPE_SHADER, &obj_shader_res)) 
@@ -164,7 +174,7 @@ KAPI b8 application_create(game* game_inst)
 	mat_config.max_material_count = 4096;
 	u64 mat_sys_memory_req = 0;
 	material_system_initialize(&mat_sys_memory_req, 0, mat_config);
-	void* mat_sys_state = Mallocate(mat_sys_memory_req, MEMORY_TAG_APPLICATION);
+	void* mat_sys_state = Mallocate(mat_sys_memory_req, MEMORY_TAG_RENDERER);
 	material_system_initialize(&mat_sys_memory_req, mat_sys_state, mat_config);
 
 	//geometry system startup
@@ -323,6 +333,7 @@ KAPI b8 application_run()
 	event_shutdown();
 	input_shutdown();
 	renderer_shutdown();
+	light_system_shutdown();
 	geometry_system_shutdown(app_state.geometry_system_state_memory);
 	material_system_shutdown(app_state.material_system_state_memory);
 	texture_system_shutdown(app_state.texture_system_state_memory);

@@ -21,6 +21,7 @@ C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\resources\loaders\
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\resources\loaders\shader_loader.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\shader_loader.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\resources\loaders\text_loader.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\text_loader.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\systems\geometry_systems.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\geometry_systems.obj
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\systems\light_system.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\light_system.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\systems\material_systems.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\material_systems.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\systems\resource_systems.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\resource_systems.obj
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\systems\shader_system.cpp;C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\x64\Debug\shader_system.obj

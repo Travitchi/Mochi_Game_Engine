@@ -4,12 +4,26 @@ layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec2 in_texcoord;
 layout(location = 2) in vec3 in_normal;
 
+struct DirectionalLight {
+    vec4 color;
+    vec4 direction;
+};
+
+struct PointLight {
+    vec4 color;
+    vec4 position;
+    vec4 attenuation;
+};
+
 layout (std140, binding = 0) uniform GlobalUniforms {
     mat4 projection;
     mat4 view;
     vec4 ambient_color;
     vec4 view_position;
-} global_ubo;                  
+    DirectionalLight dir_light;
+    PointLight p_lights[10];
+    uint num_p_lights;
+} global_ubo;
 
 layout (location = 0) uniform struct PushConstants {
     mat4 model;
@@ -21,7 +35,6 @@ layout (location = 1) out vec3 out_normal;
 layout (location = 2) out vec4 out_ambient;
 layout (location = 3) out vec3 out_view_position;
 layout (location = 4) out vec3 out_frag_position;
-
 
 void main() {
     vec4 world_position = u_push.model * vec4(in_position, 1.0);

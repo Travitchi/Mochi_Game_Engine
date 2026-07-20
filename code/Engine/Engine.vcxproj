@@ -179,6 +179,7 @@
     <ClInclude Include="src\resources\loaders\text_loader.h" />
     <ClInclude Include="src\resources\resource_types.h" />
     <ClInclude Include="src\systems\geometry_systems.h" />
+    <ClInclude Include="src\systems\light_system.h" />
     <ClInclude Include="src\systems\material_systems.h" />
     <ClInclude Include="src\systems\resource_systems.h" />
     <ClInclude Include="src\systems\shader_system.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="src\resources\loaders\shader_loader.cpp" />
     <ClCompile Include="src\resources\loaders\text_loader.cpp" />
     <ClCompile Include="src\systems\geometry_systems.cpp" />
+    <ClCompile Include="src\systems\light_system.cpp" />
     <ClCompile Include="src\systems\material_systems.cpp" />
     <ClCompile Include="src\systems\resource_systems.cpp" />
     <ClCompile Include="src\systems\shader_system.cpp" />

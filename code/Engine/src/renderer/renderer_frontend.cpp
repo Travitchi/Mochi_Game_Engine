@@ -24,9 +24,9 @@ b8 event_on_debug_event(u16 code, void* sender, void* listener_inst, event_conte
     static f64 last_swap_time = 0;
     f64 current_time = platform_get_absolute_time();
 
-    if (current_time - last_swap_time < 0.2) // 0.2 seconds cooldown
+    if (current_time - last_swap_time < 0.2)
     {
-        return TRUE; // Ignore the ghost press!
+        return TRUE;
     }
     last_swap_time = current_time;
     const char* names[2] = { "test_mat_1", "test_mat_2" };
@@ -201,7 +201,7 @@ void renderer_draw_test_geometry()
         shader* obj_shader = shader_system_get("M_object_shader");
         shader_system_use("M_object_shader");
         shader_system_set_uniform(obj_shader, "u_push.model", &data.model);
-        mat4 normal_matrix = mat4_id();
+        mat4 normal_matrix = data.model;
         shader_system_set_uniform(obj_shader, "u_push.normal_matrix", &normal_matrix);
         i32 texture_unit = 0;
         shader_system_set_uniform(obj_shader, "diffuse_sampler", &texture_unit);

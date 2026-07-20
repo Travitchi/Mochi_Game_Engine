@@ -7,6 +7,7 @@
 #include "opengl_image.h"
 #include "opengl_shader.h"
 #include "shader_system.h"
+#include "light_system.h"
 
 typedef struct opengl_geometry_data
 {
@@ -41,6 +42,16 @@ typedef struct sdl_internal_state {
     SDL_GLContext gl_context;
 } sdl_internal_state;
 
+typedef struct global_uniform_data {
+    mat4 projection;
+    mat4 view;
+    vect4 ambient_color;
+    vect4 view_position;
+    directional_light dir_light;
+    point_light p_lights[MAX_POINT_LIGHTS];
+    u32 num_p_lights;
+    u32 padding[3];
+} global_uniform_data;
 
 void APIENTRY opengl_debug_message_callback(GLenum source, GLenum type, GLuint id,GLenum severity, GLsizei length,const GLchar* message, const void* userParam) 
 {
@@ -48,7 +59,8 @@ void APIENTRY opengl_debug_message_callback(GLenum source, GLenum type, GLuint i
     {
         MERROR("OpenGL Error: %s", message);
     }
-    else {
+    else
+    {
         //add more logic here for warnings or info
     }
 }
@@ -110,7 +122,7 @@ b8 opengl_backend_initialize(renderer_backend* backend, const char* application_
 	MINFO("Global object index buffer created with size: %llu bytes", index_buffer_size);
     
 
-    u64 ubo_size = sizeof(mat4) * 2 + (sizeof(f32) * 4) + (sizeof(f32) * 4);
+    u64 ubo_size = sizeof(global_uniform_data);
     if (!render_buffer_create(&state_ptr->global_ubo, RENDER_BUFFER_TYPE_UNIFORM, ubo_size, sizeof(mat4)))
     {
         MERROR("Failed to create global uniform buffer!");
@@ -429,15 +441,30 @@ b8 opengl_backend_shader_set_uniform(struct renderer_backend* backend, struct sh
     return FALSE;
 }
 
-void opengl_backend_update_global_matrices(struct renderer_backend* backend, mat4 projection, mat4 view) 
+void opengl_backend_update_global_matrices(struct renderer_backend* backend, mat4 projection, mat4 view)
 {
     if (state_ptr)
     {
-        render_buffer_load_data(&state_ptr->global_ubo, 0, sizeof(mat4), projection.data);
-        render_buffer_load_data(&state_ptr->global_ubo, sizeof(mat4), sizeof(mat4), view.data);
-        f32 ambient_color[4] = { 0.25f, 0.25f, 0.25f, 1.0f };
-        render_buffer_load_data(&state_ptr->global_ubo, sizeof(mat4) * 2, sizeof(f32) * 4, ambient_color);
-        f32 view_pos[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        render_buffer_load_data(&state_ptr->global_ubo, sizeof(mat4) * 2 + sizeof(f32) * 4, sizeof(f32) * 4, view_pos);
+        global_uniform_data ubo_data = {};
+        ubo_data.projection = projection;
+        ubo_data.view = view;
+        ubo_data.ambient_color = vect4_create(0.25f, 0.25f, 0.25f, 1.0f);
+        ubo_data.view_position = vect4_create(0.0f, 0.0f, 0.0f, 1.0f);
+
+        directional_light* dir = light_system_get_directional();
+        if (dir) ubo_data.dir_light = *dir;
+
+        ubo_data.num_p_lights = light_system_get_point_light_count();
+        point_light* p_lights = light_system_get_point_lights();
+
+        if (p_lights) 
+        {
+            for (u32 i = 0; i < ubo_data.num_p_lights; ++i)
+            {
+                ubo_data.p_lights[i] = p_lights[i];
+            }
+        }
+
+        render_buffer_load_data(&state_ptr->global_ubo, 0, sizeof(global_uniform_data), &ubo_data);
     }
 }
