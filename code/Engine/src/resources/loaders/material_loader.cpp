@@ -24,6 +24,8 @@ b8 material_loader_load(const char* name, void* loader, resource* out_resource)
     config->auto_release = TRUE;
     config->diffuse_color = vect4_create(1.0f, 1.0f, 1.0f, 1.0f);
     config->diffuse_map_name[0] = '\0';
+    config->specular_map_name[0] = '\0';
+    config->shininess = 32.0f;
 
     std::string line;
     while (std::getline(file, line)) 
@@ -47,6 +49,14 @@ b8 material_loader_load(const char* name, void* loader, resource* out_resource)
         {
             if (value == "ui") config->type = MATERIAL_TYPE_UI;
             else config->type = MATERIAL_TYPE_WORLD;
+        }
+        else if (key == "specular_map_name")
+        {
+            strcpy_s(config->specular_map_name, 256, value.c_str());
+        }
+        else if (key == "shininess")
+        {
+            config->shininess = std::stof(value);
         }
     }
     file.close();

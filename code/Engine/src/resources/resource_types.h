@@ -23,7 +23,8 @@ typedef struct texture
 typedef enum texture_use 
 {
     TEXTURE_USE_UNKNOWN = 0,
-    TEXTURE_USE_MAP_DIFFUSE = 1
+    TEXTURE_USE_MAP_DIFFUSE = 1,
+    TEXTURE_USE_MAP_SPECULAR = 2
 } texture_use;
 
 typedef struct texture_map 
@@ -41,6 +42,8 @@ typedef struct material
     char name[256];
     vect4 diffuse_color;
     texture_map diffuse_map;
+    texture_map specular_map;
+    f32 shininess;
 } material;
 
 typedef struct material_config 
@@ -50,6 +53,8 @@ typedef struct material_config
     b8 auto_release;
     vect4 diffuse_color;
     char diffuse_map_name[256];
+    char specular_map_name[256];
+    f32 shininess;
 } material_config;
 
 typedef struct geometry
@@ -67,6 +72,7 @@ typedef enum resource_type
     RESOURCE_TYPE_BINARY,
     RESOURCE_TYPE_IMAGE,
     RESOURCE_TYPE_MATERIAL,
+    RESOURCE_TYPE_SHADER,
     RESOURCE_TYPE_CUSTOM
 } resource_type;
 
@@ -76,7 +82,7 @@ typedef struct resource
     const char* name;
     char full_path[512];
     u64 data_size;
-    void* data; // holds the actual pixels, text, or structs!
+    void* data; // holds the actual pixels, text, or structs
 } resource;
 
 typedef struct image_resource_data 

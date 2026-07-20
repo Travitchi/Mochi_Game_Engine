@@ -2,6 +2,7 @@
 #include "glad.h"
 #include "logger.h"
 #include "M_memory.h"
+#include "freelist.h"
 
 
 static u32 get_opengl_target(render_buffer_type type)
@@ -37,6 +38,13 @@ b8 render_buffer_create(render_buffer* buff, render_buffer_type type, u64 total_
 	glBufferData(target, total_size, nullptr, GL_DYNAMIC_DRAW);
 	glBindBuffer(target, 0);
 
+	u64 requirement = 0;
+	freelist_create(total_size, &requirement, 0, 0);
+	buff->freelist_memory_requirement = requirement;
+	buff->freelist_block = Mallocate(requirement, MEMORY_TAG_RENDERER);
+
+	freelist_create(total_size, &requirement, buff->freelist_block, &buff->buffer_freelist);
+
 	return TRUE;
 }
 
@@ -45,8 +53,15 @@ void render_buffer_destroy(render_buffer* buff)
 	if (buff->buffer_id != 0) 
 	{
 		glDeleteBuffers(1, &buff->buffer_id);
-		Mzero_memory(buff, sizeof(render_buffer));
 	}
+
+	if (buff->freelist_block) 
+	{
+		freelist_destroy(&buff->buffer_freelist);
+		
+	}
+	Mfree(buff->freelist_block, buff->freelist_memory_requirement, MEMORY_TAG_RENDERER);
+	Mzero_memory(buff, sizeof(render_buffer));
 }
 
 void render_buffer_bind(render_buffer* buff) 
@@ -84,16 +99,40 @@ void render_buffer_load_data(render_buffer* buff, u64 offset, u64 size, const vo
 
 void render_buffer_resize(render_buffer* buff, u64 new_size) 
 {
-	if (!buff || buff->buffer_id == 0 || new_size == buff->total_size) 
-	{
-		return;
-	}
-
+	if (!buff || buff->buffer_id == 0 || new_size <= buff->total_size) return;
 	u32 target = get_opengl_target(buff->type);
-	glBindBuffer(target, buff->buffer_id);
+	u32 new_buffer_id;
+	glGenBuffers(1, &new_buffer_id);
+	glBindBuffer(target, new_buffer_id);
 	glBufferData(target, new_size, nullptr, GL_DYNAMIC_DRAW);
-	buff->total_size = new_size;
+
+	glBindBuffer(GL_COPY_READ_BUFFER, buff->buffer_id);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, new_buffer_id);
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, buff->total_size);
+
+	glBindBuffer(GL_COPY_READ_BUFFER, 0);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 	glBindBuffer(target, 0);
+
+	glDeleteBuffers(1, &buff->buffer_id);
+	buff->buffer_id = new_buffer_id;
+	buff->total_size = new_size;
+
+	u64 new_requirement = 0;
+	freelist_resize(&buff->buffer_freelist, &new_requirement, 0, new_size, 0);
+	void* new_freelist_block = Mallocate(new_requirement, MEMORY_TAG_RENDERER);
+	void* old_freelist_block = 0;
+	if (freelist_resize(&buff->buffer_freelist, &new_requirement, new_freelist_block, new_size, &old_freelist_block))
+	{
+		Mfree(old_freelist_block, buff->freelist_memory_requirement, MEMORY_TAG_RENDERER);
+		buff->freelist_block = new_freelist_block;
+		buff->freelist_memory_requirement = new_requirement;
+	}
+	else 
+	{
+		MERROR("Failed to resize freelist for render buffer!");
+		Mfree(new_freelist_block, new_requirement, MEMORY_TAG_RENDERER);
+	}
 }
 
 void render_buffer_copy_to(render_buffer* src, render_buffer* dest, u64 size, u64 source_offset, u64 dest_offset) 
@@ -110,4 +149,16 @@ void render_buffer_copy_to(render_buffer* src, render_buffer* dest, u64 size, u6
 
 	glBindBuffer(GL_COPY_READ_BUFFER, 0);
 	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+}
+
+b8 render_buffer_allocate(render_buffer* buffer, u64 size, u64* out_offset)
+{
+	if (!buffer || !out_offset) return FALSE;
+	return freelist_allocate_block(&buffer->buffer_freelist, size, out_offset);
+}
+
+b8 render_buffer_free(render_buffer* buffer, u64 size, u64 offset)
+{
+	if (!buffer) return FALSE;
+	return freelist_free_block(&buffer->buffer_freelist, size, offset);
 }

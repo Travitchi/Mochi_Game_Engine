@@ -220,3 +220,59 @@ u64 freelist_free_space(freelist* list)
 
     return total_free;
 }
+
+b8 freelist_resize(freelist* list, u64* memory_requirement, void* new_memory, u64 new_size, void** out_old_memory)
+{
+    if (!list || new_size <= 0) return FALSE;
+    freelist_state* old_state = (freelist_state*)list->memory;
+    u64 old_size = old_state->total_size;
+    u32 new_max_entries = (u32)(new_size / sizeof(void*));
+    *memory_requirement = sizeof(freelist_state) + (sizeof(freelist_node) * new_max_entries);
+    if (!new_memory) return TRUE;
+
+    if (new_size <= old_size) 
+    {
+        MERROR("freelist_resize - new_size must be greater than old size.");
+        return FALSE;
+    }
+
+    freelist_state* new_state = (freelist_state*)new_memory;
+    new_state->nodes = (freelist_node*)((u8*)new_memory + sizeof(freelist_state));
+    new_state->max_entries = new_max_entries;
+    new_state->total_size = new_size;
+
+    for (u32 i = 0; i < new_state->max_entries; ++i) 
+    {
+        new_state->nodes[i].offset = INVALID_ID_U64;
+        new_state->nodes[i].size = INVALID_ID_U64;
+        new_state->nodes[i].next = 0;
+    }
+
+    Mcopy_memory(new_state->nodes, old_state->nodes, sizeof(freelist_node) * old_state->max_entries);
+    if (old_state->head)
+    {
+        u32 head_idx = (u32)(old_state->head - old_state->nodes);
+        new_state->head = &new_state->nodes[head_idx];
+    }
+    else 
+    {
+        new_state->head = 0;
+    }
+
+    for (u32 i = 0; i < old_state->max_entries; ++i)
+    {
+        if (new_state->nodes[i].offset != INVALID_ID_U64 && new_state->nodes[i].next)
+        {
+            freelist_node* old_next_ptr = new_state->nodes[i].next;
+            u32 next_idx = (u32)(old_next_ptr - old_state->nodes);
+            new_state->nodes[i].next = &new_state->nodes[next_idx];
+        }
+    }
+
+    *out_old_memory = list->memory;
+    list->memory = new_memory;
+    u64 size_diff = new_size - old_size;
+    freelist_free_block(list, size_diff, old_size);
+
+    return TRUE;
+}

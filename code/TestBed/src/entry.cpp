@@ -19,7 +19,8 @@ b8 create_game(game* game_out) {
 	game_out->initialize = game_initialize;
 	game_out->on_resize = game_on_resize;
 
-	game_out->state = Mallocate(sizeof(game_state), MEMORY_TAG_GAME);
+	game_out->state_memory_requirement = sizeof(game_state);
+	game_out->state = 0;
 
 	return TRUE;
 }

@@ -3,10 +3,10 @@
 #include <glad.h>
 #include <SDL.h>
 #include "Platform.h"
-#include "M_object_shader.h"
 #include "render_buffer.h"
 #include "opengl_image.h"
-#include "M_ui_shader.h"
+#include "opengl_shader.h"
+#include "shader_system.h"
 
 typedef struct opengl_geometry_data
 {
@@ -19,21 +19,17 @@ typedef struct opengl_geometry_data
 
 typedef struct opengl_state
 {
-    M_obj_shader obj_shader;
     mat4 projection;
     mat4 view;
     render_buffer global_ubo;
     render_buffer object_vertex_buffer;
     render_buffer object_index_buffer;
-    u64 geometry_vertex_offset;
-    u64 geometry_index_offset;
     u32 master_vao;
     f32 fov;
     f32 near_clip;
 	f32 far_clip;
     opengl_geometry_data geometries[4096];
     u32 next_internal_geometry_id;
-    M_ui_shader ui_shader;
     u32 ui_vao;
 
 } opengl_state;
@@ -93,8 +89,6 @@ b8 opengl_backend_initialize(renderer_backend* backend, const char* application_
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(opengl_debug_message_callback, NULL);
 
-    state_ptr->obj_shader.M_obj_shader_init();
-    state_ptr->ui_shader.M_ui_shader_init();
    
 
     u64 vertex_buffer_size = sizeof(u32) * 1024 * 1024;
@@ -104,7 +98,7 @@ b8 opengl_backend_initialize(renderer_backend* backend, const char* application_
         return FALSE;
     }
     MINFO("Global object vertex buffer created with size: %llu bytes", vertex_buffer_size);
-    state_ptr->geometry_vertex_offset = 0;
+    
 
     u64 index_buffer_size = sizeof(u32) * 1024 * 1024;
     if (!render_buffer_create(&state_ptr->object_index_buffer, RENDER_BUFFER_TYPE_INDEX, index_buffer_size, sizeof(u32)))
@@ -114,9 +108,9 @@ b8 opengl_backend_initialize(renderer_backend* backend, const char* application_
     }
 	//checks if it is created and how much memory it can hold
 	MINFO("Global object index buffer created with size: %llu bytes", index_buffer_size);
-    state_ptr->geometry_index_offset = 0;
+    
 
-    u64 ubo_size = sizeof(mat4) * 2;
+    u64 ubo_size = sizeof(mat4) * 2 + (sizeof(f32) * 4) + (sizeof(f32) * 4);
     if (!render_buffer_create(&state_ptr->global_ubo, RENDER_BUFFER_TYPE_UNIFORM, ubo_size, sizeof(mat4)))
     {
         MERROR("Failed to create global uniform buffer!");
@@ -166,7 +160,6 @@ void opengl_backend_shutdown(renderer_backend* backend)
         render_buffer_destroy(&state_ptr->global_ubo);
         render_buffer_destroy(&state_ptr->object_vertex_buffer);
         render_buffer_destroy(&state_ptr->object_index_buffer);
-        glDeleteProgram(state_ptr->obj_shader.shader_id);
         Mfree(state_ptr, sizeof(opengl_state), MEMORY_TAG_RENDERER);
         state_ptr = nullptr;
     }
@@ -190,17 +183,14 @@ void opengl_backend_resized(renderer_backend* backend, u16 width, u16 height)
 b8 opengl_backend_begin_frame(renderer_backend* backend, f32 delta_time) 
 {
     static b8 first_frame = TRUE;
-    if (first_frame) {
+    if (first_frame)
+    {
         MINFO("First frame successfully cleared! Backend is working.");
         first_frame = FALSE;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(0.1f, 0.1f, 0.12f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // TODO: test code
-    state_ptr->obj_shader.M_obj_shader_use();
-    glBindVertexArray(state_ptr->master_vao);
     
     return TRUE;
 }
@@ -213,43 +203,37 @@ b8 opengl_backend_end_frame(renderer_backend* backend, f32 delta_time)
     return TRUE;
 }
 
-void opengl_backend_update_global_world_state(struct renderer_backend* backend, mat4 projection, mat4 view)
+void opengl_backend_update_object(struct renderer_backend* backend, geometry_render_data data)
 {
-    if (state_ptr)
-    {
-        state_ptr->obj_shader.M_obj_shader_use();
-        state_ptr->obj_shader.update_glob_state(&state_ptr->global_ubo, state_ptr->projection, state_ptr->view);
-    }
-}
-
-void opengl_backend_update_object(struct renderer_backend* backend, geometry_render_data data) {
     if (!state_ptr || !data.geometry) return;
     b8 is_ui = (data.geometry->material && data.geometry->material->type == MATERIAL_TYPE_UI);
 
     if (is_ui) 
     {
-        state_ptr->ui_shader.M_ui_shader_use();
-        state_ptr->ui_shader.update_object_state(data.model);
         glBindVertexArray(state_ptr->ui_vao);
-        u32 sampler_location = glGetUniformLocation(state_ptr->ui_shader.shader_id, "diffuse_sampler");
-        glUniform1i(sampler_location, 0);
     }
     else 
     {
-        state_ptr->obj_shader.M_obj_shader_use();
-        state_ptr->obj_shader.update_object_state(data.model, mat4_id());
         glBindVertexArray(state_ptr->master_vao);
-        u32 sampler_location = glGetUniformLocation(state_ptr->obj_shader.shader_id, "diffuse_sampler");
-        glUniform1i(sampler_location, 0);
     }
 
-    if (data.geometry->material && data.geometry->material->diffuse_map.texture) 
+    if (data.geometry->material && data.geometry->material->diffuse_map.texture)
     {
         opengl_image* img = (opengl_image*)data.geometry->material->diffuse_map.texture->internal_data;
-        if (img) 
+        if (img)
         {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, img->handle);
+        }
+    }
+
+    if (data.geometry->material && data.geometry->material->specular_map.texture)
+    {
+        opengl_image* spec_img = (opengl_image*)data.geometry->material->specular_map.texture->internal_data;
+        if (spec_img)
+        {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, spec_img->handle);
         }
     }
 
@@ -325,32 +309,46 @@ void opengl_backend_create_geometry(struct renderer_backend* backend, geometry* 
     u32 total_vertex_size = vertex_size * vertex_count;
     u32 total_index_size = index_size * index_count;
     opengl_geometry_data* internal_data = &state_ptr->geometries[internal_id];
-    internal_data->vertex_buffer_offset = state_ptr->geometry_vertex_offset;
-    internal_data->index_buffer_offset = state_ptr->geometry_index_offset;
     internal_data->vertex_count = vertex_count;
     internal_data->index_count = index_count;
-    render_buffer_load_data(&state_ptr->object_vertex_buffer, internal_data->vertex_buffer_offset, total_vertex_size, vertices);
-    state_ptr->geometry_vertex_offset += total_vertex_size;
-
-    if (index_count > 0)
+    u64 vertex_offset = 0;
+    if (!render_buffer_allocate(&state_ptr->object_vertex_buffer, total_vertex_size, &vertex_offset)) 
     {
+        MERROR("opengl_backend_create_geometry failed to allocate vertex buffer space!");
+        return;
+    }
+
+    internal_data->vertex_buffer_offset = vertex_offset;
+    render_buffer_load_data(&state_ptr->object_vertex_buffer, internal_data->vertex_buffer_offset, total_vertex_size, vertices);
+    if (index_count > 0) 
+    {
+        u64 index_offset = 0;
+        if (!render_buffer_allocate(&state_ptr->object_index_buffer, total_index_size, &index_offset))
+        {
+            MERROR("opengl_backend_create_geometry failed to allocate index buffer space!");
+            return;
+        }
+
+        internal_data->index_buffer_offset = index_offset;
         render_buffer_load_data(&state_ptr->object_index_buffer, internal_data->index_buffer_offset, total_index_size, indices);
-        state_ptr->geometry_index_offset += total_index_size;
     }
 }
 
-void opengl_backend_destroy_geometry(struct renderer_backend* backend, geometry* geometry) 
+void opengl_backend_destroy_geometry(struct renderer_backend* backend, geometry* geometry)
 {
-    //todo:implement a free list for geometry
-    geometry->internal_id = 0;
-}
-
-void opengl_backend_update_global_ui_state(struct renderer_backend* backend, mat4 projection, mat4 view)
-{
-    if (state_ptr)
+    if (geometry && geometry->internal_id != 0) 
     {
-        state_ptr->ui_shader.M_ui_shader_use();
-        state_ptr->ui_shader.update_global_state(&state_ptr->global_ubo, projection, view);
+        opengl_geometry_data* internal_data = &state_ptr->geometries[geometry->internal_id];
+        u32 total_vertex_size = sizeof(vertex_3d) * internal_data->vertex_count;
+        render_buffer_free(&state_ptr->object_vertex_buffer, total_vertex_size, internal_data->vertex_buffer_offset);
+        if (internal_data->index_count > 0)
+        {
+            u32 total_index_size = sizeof(u32) * internal_data->index_count;
+            render_buffer_free(&state_ptr->object_index_buffer, total_index_size, internal_data->index_buffer_offset);
+        }
+
+        Mzero_memory(internal_data, sizeof(opengl_geometry_data));
+        geometry->internal_id = 0;
     }
 }
 
@@ -386,5 +384,60 @@ void opengl_backend_end_render_pass(struct renderer_backend* backend, u8 pass_id
     {
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
+    }
+}
+
+b8 opengl_backend_shader_create(struct renderer_backend* backend, struct shader* shader, const struct shader_config* config) 
+{
+    opengl_shader* out_shader = (opengl_shader*)Mallocate(sizeof(opengl_shader), MEMORY_TAG_RENDERER);
+    if (!opengl_shader_create(config->name, out_shader)) return FALSE;
+    for (u32 i = 0; i < config->attribute_count; ++i) 
+    {
+        opengl_shader_add_attribute(out_shader, config->attributes[i].name, config->attributes[i].type);
+    }
+    for (u32 i = 0; i < config->uniform_count; ++i) 
+    {
+        opengl_shader_add_uniform(out_shader, config->uniforms[i].name, config->uniforms[i].type);
+    }
+
+    opengl_shader_initialize(out_shader);
+    shader->internal_data = out_shader;
+    return TRUE;
+}
+
+void opengl_backend_shader_destroy(struct renderer_backend* backend, struct shader* shader) 
+{
+    if (shader && shader->internal_data) 
+    {
+        opengl_shader_destroy((opengl_shader*)shader->internal_data);
+        Mfree(shader->internal_data, sizeof(opengl_shader), MEMORY_TAG_RENDERER);
+        shader->internal_data = 0;
+    }
+}
+
+b8 opengl_backend_shader_use(struct renderer_backend* backend, struct shader* shader)
+{
+    return opengl_shader_use((opengl_shader*)shader->internal_data);
+}
+
+b8 opengl_backend_shader_set_uniform(struct renderer_backend* backend, struct shader* shader, u16 index, void* value) 
+{
+    if (shader && shader->internal_data)
+    {
+        return opengl_shader_set_uniform((opengl_shader*)shader->internal_data, index, value);
+    }
+    return FALSE;
+}
+
+void opengl_backend_update_global_matrices(struct renderer_backend* backend, mat4 projection, mat4 view) 
+{
+    if (state_ptr)
+    {
+        render_buffer_load_data(&state_ptr->global_ubo, 0, sizeof(mat4), projection.data);
+        render_buffer_load_data(&state_ptr->global_ubo, sizeof(mat4), sizeof(mat4), view.data);
+        f32 ambient_color[4] = { 0.25f, 0.25f, 0.25f, 1.0f };
+        render_buffer_load_data(&state_ptr->global_ubo, sizeof(mat4) * 2, sizeof(f32) * 4, ambient_color);
+        f32 view_pos[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        render_buffer_load_data(&state_ptr->global_ubo, sizeof(mat4) * 2 + sizeof(f32) * 4, sizeof(f32) * 4, view_pos);
     }
 }

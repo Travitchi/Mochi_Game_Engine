@@ -18,3 +18,5 @@ KAPI b8 freelist_free_block(freelist* list, u64 size, u64 offset);
 KAPI void freelist_clear(freelist* list);
 
 KAPI u64 freelist_free_space(freelist* list);
+
+KAPI b8 freelist_resize(freelist* list, u64* memory_requirement, void* new_memory, u64 new_size, void** out_old_memory);

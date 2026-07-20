@@ -1,5 +1,6 @@
 #pragma once
 #include "defines.hpp"
+#include "freelist.h"
 
 typedef enum render_buffer_type
 {
@@ -14,6 +15,9 @@ typedef struct render_buffer
 	u64 total_size;
 	u64 stride; //size of a single elemnent
 	render_buffer_type type;
+	freelist buffer_freelist;
+	void* freelist_block;
+	u64 freelist_memory_requirement;
 } render_buffer;
 
 
@@ -28,3 +32,6 @@ void render_buffer_unbind(render_buffer* buffer);
 void render_buffer_load_data(render_buffer* buffer, u64 offset, u64 size, const void* data);
 void render_buffer_resize(render_buffer* buffer, u64 new_size);
 void render_buffer_copy_to(render_buffer* src, render_buffer* dest, u64 size, u64 source_offset, u64 dest_offset);
+
+b8 render_buffer_allocate(render_buffer* buffer, u64 size, u64* out_offset);
+b8 render_buffer_free(render_buffer* buffer, u64 size, u64 offset);

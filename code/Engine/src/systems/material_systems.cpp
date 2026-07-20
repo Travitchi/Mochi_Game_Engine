@@ -72,6 +72,17 @@ material* material_system_acquire(const char* name)
         new_mat->diffuse_map.texture = texture_system_get_default_texture();
     }
 
+    new_mat->shininess = config->shininess;
+    new_mat->specular_map.use = TEXTURE_USE_MAP_SPECULAR;
+    if (strlen(config->specular_map_name) > 0)
+    {
+        new_mat->specular_map.texture = texture_system_acquire(config->specular_map_name, config->auto_release);
+    }
+    else
+    {
+        new_mat->specular_map.texture = texture_system_get_default_specular_texture();
+    }
+
     resource_system_unload(&mat_resource);
 
     return new_mat;

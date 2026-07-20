@@ -12,3 +12,4 @@ void texture_system_shutdown(void* state);
 texture* texture_system_acquire(const char* name, b8 auto_release);
 void texture_system_release(const char* name);
 texture* texture_system_get_default_texture();
+texture* texture_system_get_default_specular_texture();

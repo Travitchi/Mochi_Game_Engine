@@ -17,6 +17,7 @@ typedef struct texture_system_state
 {
     texture_system_config config;
     texture default_texture;
+    texture default_specular_texture;
     texture* registered_textures;
     hashtable registered_texture_table;
 } texture_system_state;
@@ -73,6 +74,11 @@ b8 texture_system_initialize(u64* memory_requirement, void* state, texture_syste
     renderer_create_texture("default", FALSE, tex_dim, tex_dim, channels, pixels, FALSE, &state_ptr->default_texture);
     Mfree(pixels, tex_dim * tex_dim * channels, MEMORY_TAG_ARRAY);
 
+    u8* spec_pixels = (u8*)Mallocate(tex_dim * tex_dim * channels, MEMORY_TAG_ARRAY);
+    Mset_memory(spec_pixels, 0, tex_dim * tex_dim * channels);
+    renderer_create_texture("default_specular", FALSE, tex_dim, tex_dim, channels, spec_pixels, FALSE, &state_ptr->default_specular_texture);
+    Mfree(spec_pixels, tex_dim * tex_dim * channels, MEMORY_TAG_ARRAY);
+
     return TRUE;
 }
 
@@ -105,4 +111,9 @@ void texture_system_release(const char* name)
 texture* texture_system_get_default_texture() 
 {
     return &state_ptr->default_texture;
+}
+
+texture* texture_system_get_default_specular_texture() 
+{
+    return &state_ptr->default_specular_texture;
 }

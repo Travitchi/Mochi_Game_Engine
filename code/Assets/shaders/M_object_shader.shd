@@ -1,0 +1,6 @@
+# Object Shader Configuration
+uniform=u_push.model,10
+uniform=u_push.normal_matrix,10
+uniform=diffuse_sampler,11
+uniform=specular_sampler,11
+uniform=shininess,0

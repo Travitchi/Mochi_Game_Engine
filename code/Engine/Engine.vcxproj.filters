@@ -69,9 +69,6 @@
     <ClInclude Include="src\math\M_math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\OpenGL\shaders\M_object_shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\renderer\OpenGL\shaders\M_shader_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -108,13 +105,19 @@
     <ClInclude Include="src\resources\loaders\material_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\OpenGL\shaders\M_ui_shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\containers\freelist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\memory\dynamic_allocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\OpenGL\opengl_shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\shader_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resources\loaders\shader_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -155,9 +158,6 @@
     <ClCompile Include="src\math\M_math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\OpenGL\shaders\M_obj_shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\renderer\render_buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -188,13 +188,19 @@
     <ClCompile Include="src\resources\loaders\material_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\OpenGL\shaders\M_ui_shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\containers\freelist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\memory\dynamic_allocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\OpenGL\opengl_shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\shader_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resources\loaders\shader_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -49,6 +49,15 @@ STATIC_ASSERT(sizeof(i64) == 8, "Expected i64 to be 8 bytes.");
 STATIC_ASSERT(sizeof(f32) == 4, "Expected f32 to be 4 bytes.");
 STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes.");
 
+
+#define GIBIBYTES(amount) ((amount) * 1024ULL * 1024ULL * 1024ULL)
+#define MEBIBYTES(amount) ((amount) * 1024ULL * 1024ULL)
+#define KIBIBYTES(amount) ((amount) * 1024ULL)
+
+#define GIGABYTES(amount) ((amount) * 1000ULL * 1000ULL * 1000ULL)
+#define MEGABYTES(amount) ((amount) * 1000ULL * 1000ULL)
+#define KILOBYTES(amount) ((amount) * 1000ULL)
+
 #define TRUE 1
 #define FALSE 0
 

@@ -1,15 +1,14 @@
-﻿  freelist.cpp
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/containers/freelist.cpp')
+﻿  opengl_shader.cpp
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(37,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/renderer/OpenGL/opengl_shader.cpp')
   
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/containers/freelist.cpp')
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(43,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/renderer/OpenGL/opengl_shader.cpp')
   
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/containers/freelist.cpp')
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(49,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/renderer/OpenGL/opengl_shader.cpp')
   
-C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  (compiling source file 'src/containers/freelist.cpp')
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\logger.h(55,5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  (compiling source file 'src/renderer/OpenGL/opengl_shader.cpp')
   
-     Creating library C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\Engine.lib and object C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\Engine.exp
-  Engine.vcxproj -> C:\Users\travi\Desktop\Mochi\Mochi_Game_Engine\code\bin\Debug\Engine.dll
+  Engine.vcxproj -> C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.dll

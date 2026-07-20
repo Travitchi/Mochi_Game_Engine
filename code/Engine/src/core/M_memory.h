@@ -4,7 +4,7 @@
 
 typedef enum memory_tag
 {
-	MEMORY_TAG_UNKOWN, //default
+	MEMORY_TAG_UNKNOWN, //default
 	MEMORY_TAG_ARRAY,
 	MEMORY_TAG_DARRAY, 
 	MEMORY_TAG_DICT, 

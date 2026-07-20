@@ -11,12 +11,13 @@ MINLINE u32 create_shader_program(const char* vert_name, const char* frag_name)
     resource vert_res = {};
     resource frag_res = {};
 
-    //file missing or locked it will throw an exception
-    if (!resource_system_load(vert_name, RESOURCE_TYPE_TEXT, &vert_res)) {
+    if (!resource_system_load(vert_name, RESOURCE_TYPE_TEXT, &vert_res))
+    {
         MERROR("Failed to load vertex shader resource: %s", vert_name);
         return 0;
     }
-    if (!resource_system_load(frag_name, RESOURCE_TYPE_TEXT, &frag_res)) {
+    if (!resource_system_load(frag_name, RESOURCE_TYPE_TEXT, &frag_res))
+    {
         MERROR("Failed to load fragment shader resource: %s", frag_name);
         return 0;
     }

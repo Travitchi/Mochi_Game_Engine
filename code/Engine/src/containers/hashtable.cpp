@@ -56,3 +56,35 @@ b8 hashtable_fill(hashtable* table, void* value)
     }
     return TRUE;
 }
+
+b8 hashtable_set(hashtable* table, const char* name, void* value) 
+{
+    if (!table || !name || !value) return FALSE;
+
+    u64 hash = 5381;
+    i32 c;
+    const char* str = name;
+    while ((c = *str++)) 
+    {
+        hash = ((hash << 5) + hash) + c;
+    }
+
+    hash %= table->element_count;
+    Mcopy_memory((u8*)table->memory + (table->element_size * hash), value, table->element_size);
+    return TRUE;
+}
+
+b8 hashtable_get(hashtable* table, const char* name, void* out_value)
+{
+    if (!table || !name || !out_value) return FALSE;
+    u64 hash = 5381;
+    i32 c;
+    const char* str = name;
+    while ((c = *str++))
+    {
+        hash = ((hash << 5) + hash) + c;
+    }
+    hash %= table->element_count;
+    Mcopy_memory(out_value, (u8*)table->memory + (table->element_size * hash), table->element_size);
+    return TRUE;
+}

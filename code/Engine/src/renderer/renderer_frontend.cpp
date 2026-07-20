@@ -10,9 +10,12 @@
 #include "texture_systems.h"
 #include "material_systems.h"
 #include "geometry_systems.h"
+#include "shader_system.h"
 
 static renderer_backend* backend = 0;
 static geometry* test_geometry = 0;
+static mat4 world_projection = mat4_id();
+static mat4 world_view = mat4_id();
 
 
 b8 event_on_debug_event(u16 code, void* sender, void* listener_inst, event_context context)
@@ -57,8 +60,6 @@ b8 renderer_initialize(const char* application_name, struct platform_state* plat
     backend->resized = opengl_backend_resized;
     backend->begin_frame = opengl_backend_begin_frame;
     backend->end_frame = opengl_backend_end_frame;
-    backend->update_global_world_state = opengl_backend_update_global_world_state;
-    backend->update_global_ui_state = opengl_backend_update_global_ui_state;
     backend->begin_render_pass = opengl_backend_begin_render_pass;
     backend->end_render_pass = opengl_backend_end_render_pass;
     backend->update_object = opengl_backend_update_object;
@@ -68,6 +69,11 @@ b8 renderer_initialize(const char* application_name, struct platform_state* plat
     backend->destroy_texture = opengl_backend_destroy_texture;
     backend->create_geometry = opengl_backend_create_geometry;
     backend->destroy_geometry = opengl_backend_destroy_geometry;
+    backend->shader_create = opengl_backend_shader_create;
+    backend->shader_destroy = opengl_backend_shader_destroy;
+    backend->shader_use = opengl_backend_shader_use;
+    backend->shader_set_uniform = opengl_backend_shader_set_uniform;
+    backend->update_global_matrices = opengl_backend_update_global_matrices;
 
     if (!backend->initialize(backend, application_name, plat_state))
     {
@@ -90,15 +96,21 @@ void renderer_shutdown()
     }
 }
 
-void renderer_on_resize(u16 width, u16 height) {
-    if (backend) {
+void renderer_on_resize(u16 width, u16 height)
+{
+    if (height != 0)
+    {
+        world_projection = mat4_perspective(deg_to_rad(90.0f), (f32)width / (f32)height, 0.1f, 1000.0f);
+    }
+    if (backend) 
+    {
         backend->resized(backend, width, height);
     }
 }
 
-
 void renderer_set_view(mat4 view)
 {
+    world_view = view;
     if (backend && backend->set_view)
     {
         backend->set_view(backend, view);
@@ -167,34 +179,78 @@ void renderer_draw_geometry(geometry_render_data data)
     }
 }
 
-void renderer_update_global_ui_state(mat4 projection, mat4 view)
-{
-    if (backend && backend->update_global_ui_state)
-    {
-        backend->update_global_ui_state(backend, projection, view);
-    }
-}
-
 void renderer_draw_test_geometry()
 {
     if (backend && backend->update_object)
     {
-        if (backend->update_global_world_state)
-        {
-            backend->update_global_world_state(backend, mat4_id(), mat4_id());
-        }
-
-        mat4 translation = mat4_translation(vect3{ 0.0f, -2.0f, -10.0f });
-        geometry_render_data data = {};
         if (!test_geometry)
         {
-            geometry_config plane_config = geometry_system_generate_plane_config(10.0f, 5.0f, 5, 5, 2.0f, 2.0f, "test_plane", "test_mat_1");
-            test_geometry = geometry_system_acquire_from_config(plane_config, TRUE);
-            Mfree(plane_config.vertices, plane_config.vertex_size * plane_config.vertex_count, MEMORY_TAG_ARRAY);
-            Mfree(plane_config.indices, plane_config.index_size * plane_config.index_count, MEMORY_TAG_ARRAY);
+            geometry_config cube_config = geometry_system_generate_cube_config(10.0f, 10.0f, 10.0f, 1.0f, 1.0f, "test_cube", "test_mat_1");
+            test_geometry = geometry_system_acquire_from_config(cube_config, TRUE);
+            Mfree(cube_config.vertices, cube_config.vertex_size * cube_config.vertex_count, MEMORY_TAG_ARRAY);
+            Mfree(cube_config.indices, cube_config.index_size * cube_config.index_count, MEMORY_TAG_ARRAY);
         }
+
+        geometry_render_data data = {};
         data.geometry = test_geometry;
-        data.model = translation;
+        static f32 angle = 0.0f;
+        angle += 0.0005f;
+        mat4 rotation = mat4_eulero_xyz(angle * 0.5f, angle, 0.0f);
+        mat4 translation = mat4_translation(vect3_create(0.0f, 0.0f, -20.0f));
+        data.model = mat4_mult(rotation, translation);
+        shader* obj_shader = shader_system_get("M_object_shader");
+        shader_system_use("M_object_shader");
+        shader_system_set_uniform(obj_shader, "u_push.model", &data.model);
+        mat4 normal_matrix = mat4_id();
+        shader_system_set_uniform(obj_shader, "u_push.normal_matrix", &normal_matrix);
+        i32 texture_unit = 0;
+        shader_system_set_uniform(obj_shader, "diffuse_sampler", &texture_unit);
+
+
+        i32 spec_texture_unit = 1;
+        shader_system_set_uniform(obj_shader, "specular_sampler", &spec_texture_unit);
+        shader_system_set_uniform(obj_shader, "shininess", &data.geometry->material->shininess);
+
         backend->update_object(backend, data);
+    }
+}
+
+b8 renderer_shader_create(struct shader* shader, const struct shader_config* config)
+{
+    return backend->shader_create(backend, shader, config);
+}
+
+void renderer_shader_destroy(struct shader* shader)
+{
+    if (backend && backend->shader_destroy)
+    {
+        backend->shader_destroy(backend, shader);
+    }
+}
+
+b8 renderer_shader_use(struct shader* shader) 
+{
+    return backend->shader_use(backend, shader);
+}
+
+b8 renderer_shader_set_uniform(struct shader* shader, u16 index, void* value) 
+{
+    if (!backend || !backend->shader_set_uniform) return FALSE;
+    return backend->shader_set_uniform(backend, shader, index, value);
+}
+
+void renderer_update_global_matrices(mat4 projection, mat4 view) 
+{
+    if (backend && backend->update_global_matrices) 
+    {
+        backend->update_global_matrices(backend, projection, view);
+    }
+}
+
+void renderer_push_world_matrices()
+{
+    if (backend && backend->update_global_matrices) 
+    {
+        backend->update_global_matrices(backend, world_projection, world_view);
     }
 }

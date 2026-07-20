@@ -16,8 +16,6 @@ typedef struct renderer_backend
     void (*resized)(struct renderer_backend* backend, u16 width, u16 height);
     b8(*begin_frame)(struct renderer_backend* backend, f32 delta_time);
     b8(*end_frame)(struct renderer_backend* backend, f32 delta_time);
-    void (*update_global_world_state)(struct renderer_backend* backend, mat4 projection, mat4 view);
-    void (*update_global_ui_state)(struct renderer_backend* backend, mat4 projection, mat4 view);
     b8(*begin_render_pass)(struct renderer_backend* backend, u8 pass_id);
     void (*end_render_pass)(struct renderer_backend* backend, u8 pass_id);
     void (*update_object)(struct renderer_backend* backend, geometry_render_data data);
@@ -27,4 +25,9 @@ typedef struct renderer_backend
     void (*destroy_texture)(struct renderer_backend* backend, struct texture* texture);
     void (*create_geometry)(struct renderer_backend* backend, struct geometry* geometry, u32 vertex_size, u32 vertex_count, const void* vertices, u32 index_size, u32 index_count, const void* indices);
     void (*destroy_geometry)(struct renderer_backend* backend, struct geometry* geometry);
+    b8(*shader_create)(struct renderer_backend* backend, struct shader* shader, const struct shader_config* config);
+    void (*shader_destroy)(struct renderer_backend* backend, struct shader* shader);
+    b8(*shader_use)(struct renderer_backend* backend, struct shader* shader);
+    b8(*shader_set_uniform)(struct renderer_backend* backend, struct shader* shader, u16 index, void* value);
+    void (*update_global_matrices)(struct renderer_backend* backend, mat4 projection, mat4 view);
 } renderer_backend;

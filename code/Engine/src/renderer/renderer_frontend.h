@@ -30,11 +30,15 @@ KAPI b8 renderer_begin_frame(render_packet* packet);
 KAPI b8 renderer_end_frame(render_packet* packet);
 KAPI void renderer_draw_geometry(struct geometry_render_data data);
 KAPI void renderer_draw_test_geometry();
-
 KAPI void renderer_create_texture(const char* name, b8 auto_release, i32 width, i32 height, i32 channel_count, const u8* pixels, b8 has_transparency, texture* out_texture);
 KAPI void renderer_destroy_texture(texture* texture);
 KAPI void renderer_create_geometry(geometry* geometry, u32 vertex_size, u32 vertex_count, const void* vertices, u32 index_size, u32 index_count, const void* indices);
 KAPI void renderer_destroy_geometry(geometry* geometry);
 KAPI b8 renderer_begin_render_pass(u8 pass_id);
 KAPI void renderer_end_render_pass(u8 pass_id);
-KAPI void renderer_update_global_ui_state(mat4 projection, mat4 view);
+KAPI b8 renderer_shader_create(struct shader* shader, const struct shader_config* config);
+KAPI void renderer_shader_destroy(struct shader* shader);
+KAPI b8 renderer_shader_use(struct shader* shader);
+KAPI b8 renderer_shader_set_uniform(struct shader* shader, u16 index, void* value);
+KAPI void renderer_update_global_matrices(mat4 projection, mat4 view);
+KAPI void renderer_push_world_matrices();

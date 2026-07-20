@@ -48,6 +48,13 @@ void log_output(log_level level, const char* message, ...) {
 
     std::string final_output = std::string(level_strings[level]) + formatted_message + "\n";
 
+    static std::string last_log_message = "";
+    if (final_output == last_log_message)
+    {
+        return;
+    }
+    last_log_message = final_output;
+
     if (is_error) {
         platform_console_write_error(final_output.c_str(), level);
     }

@@ -15,6 +15,8 @@
 #include "image_loader.h"
 #include "text_loader.h"
 #include "material_loader.h"
+#include "shader_system.h"
+#include "shader_loader.h"
 #include <string.h>
 
 typedef struct application_state
@@ -35,6 +37,7 @@ typedef struct application_state
 	void* resource_system_state_memory;
 	u64 geometry_system_memory_requirement;
 	void* geometry_system_state_memory;
+	void* shader_system_state_memory;
 };
 
 static b8 initialized = FALSE;  //safety check
@@ -55,6 +58,14 @@ KAPI b8 application_create(game* game_inst)
 	}
 
 	app_state.game_inst = game_inst;
+
+	game_inst->state = Mallocate(game_inst->state_memory_requirement, MEMORY_TAG_GAME);
+	if (!game_inst->state)
+	{
+		MFATAL("Failed to allocate game state!");
+		return FALSE;
+	}
+
 
 	//initialize subsystem
 	initialize_logging();
@@ -107,6 +118,7 @@ KAPI b8 application_create(game* game_inst)
 	resource_system_register_loader(image_resource_loader_create());
 	resource_system_register_loader(text_resource_loader_create());
 	resource_system_register_loader(material_resource_loader_create());
+	resource_system_register_loader(shader_resource_loader_create());
 
 	//renderer startup
 	if (!renderer_initialize(game_inst->app_config.name, &app_state.platform)) 
@@ -122,6 +134,30 @@ KAPI b8 application_create(game* game_inst)
 	texture_system_initialize(&app_state.texture_system_memory_requirement, 0, tex_config);
 	app_state.texture_system_state_memory = Mallocate(app_state.texture_system_memory_requirement, MEMORY_TAG_APPLICATION);
 	texture_system_initialize(&app_state.texture_system_memory_requirement, app_state.texture_system_state_memory, tex_config);
+
+	//shader system startup
+	shader_system_config shader_config;
+	shader_config.max_shader_count = 1024;
+	u64 shader_sys_memory_req = 0;
+	shader_system_initialize(&shader_sys_memory_req, 0, shader_config);
+	void* shader_sys_state = Mallocate(shader_sys_memory_req, MEMORY_TAG_APPLICATION);
+	app_state.shader_system_state_memory = Mallocate(shader_sys_memory_req, MEMORY_TAG_APPLICATION);
+	shader_system_initialize(&shader_sys_memory_req, shader_sys_state, shader_config);
+	resource obj_shader_res;
+	if (resource_system_load("M_object_shader", RESOURCE_TYPE_SHADER, &obj_shader_res)) 
+	{
+		shader out_s;
+		shader_system_create_shader((const struct shader_config*)obj_shader_res.data, &out_s);
+		resource_system_unload(&obj_shader_res);
+	}
+
+	resource ui_shader_res;
+	if (resource_system_load("M_ui_shader", RESOURCE_TYPE_SHADER, &ui_shader_res))
+	{
+		shader out_s;
+		shader_system_create_shader((const struct shader_config*)ui_shader_res.data, &out_s);
+		resource_system_unload(&ui_shader_res);
+	}
 
 	//material system startup
 	material_system_config mat_config;
@@ -234,17 +270,22 @@ KAPI b8 application_run()
 			{
 				if (renderer_begin_render_pass(BUILTIN_RENDER_PASS_WORLD))
 				{
+					renderer_push_world_matrices();
 					renderer_draw_test_geometry();
 					renderer_end_render_pass(BUILTIN_RENDER_PASS_WORLD);
 				}
-
+				/*
 				if (renderer_begin_render_pass(BUILTIN_RENDER_PASS_UI))
 				{
-					renderer_update_global_ui_state(ui_projection, ui_view);
+					renderer_update_global_matrices(ui_projection, ui_view);
+					shader* ui_shader = shader_system_get("M_ui_shader");
+					shader_system_use("M_ui_shader");
+					mat4 ui_model = mat4_id();
+					shader_system_set_uniform(ui_shader, "u_push.model", &ui_model);
 					renderer_draw_geometry(my_ui_image);
 					renderer_end_render_pass(BUILTIN_RENDER_PASS_UI);
 				}
-
+				*/
 				renderer_end_frame(&packet);
 			}
 
@@ -285,6 +326,7 @@ KAPI b8 application_run()
 	geometry_system_shutdown(app_state.geometry_system_state_memory);
 	material_system_shutdown(app_state.material_system_state_memory);
 	texture_system_shutdown(app_state.texture_system_state_memory);
+	shader_system_shutdown(app_state.shader_system_state_memory);
 	resource_system_shutdown(app_state.resource_system_state_memory);
 	platform_shutdown(&app_state.platform);
 	shutdown_logging();

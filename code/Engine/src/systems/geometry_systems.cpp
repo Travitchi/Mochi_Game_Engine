@@ -118,12 +118,19 @@ geometry_config geometry_system_generate_plane_config(f32 width, f32 height, u32
             f32 max_uv_y = ((y + 1) / (f32)y_segment_count) * tile_y;
 
             v_ptr[0].position = vect3_create(min_x, min_y, 0.0f);
+            v_ptr[0].normal = vect3_create(0.0f, 0.0f, 1.0f);
             v_ptr[0].texture = vect2_create(min_uv_x, min_uv_y);
+
             v_ptr[1].position = vect3_create(max_x, min_y, 0.0f);
+            v_ptr[1].normal = vect3_create(0.0f, 0.0f, 1.0f);
             v_ptr[1].texture = vect2_create(max_uv_x, min_uv_y);
+
             v_ptr[2].position = vect3_create(max_x, max_y, 0.0f);
+            v_ptr[2].normal = vect3_create(0.0f, 0.0f, 1.0f);
             v_ptr[2].texture = vect2_create(max_uv_x, max_uv_y);
+
             v_ptr[3].position = vect3_create(min_x, max_y, 0.0f);
+            v_ptr[3].normal = vect3_create(0.0f, 0.0f, 1.0f);
             v_ptr[3].texture = vect2_create(min_uv_x, max_uv_y);
 
             i_ptr[0] = v_index + 0; i_ptr[1] = v_index + 1; i_ptr[2] = v_index + 2;
@@ -134,5 +141,81 @@ geometry_config geometry_system_generate_plane_config(f32 width, f32 height, u32
             v_index += 4;
         }
     }
+    return config;
+}
+
+//test directional lighting with a cube
+geometry_config geometry_system_generate_cube_config(f32 width, f32 height, f32 depth, f32 tile_x, f32 tile_y, const char* name, const char* material_name) {
+    geometry_config config = {};
+    config.vertex_size = sizeof(vertex_3d);
+    config.vertex_count = 24; // 4 verts per face * 6 faces
+    config.vertices = Mallocate(sizeof(vertex_3d) * config.vertex_count, MEMORY_TAG_ARRAY);
+    config.index_size = sizeof(u32);
+    config.index_count = 36; // 6 indices per face * 6 faces
+    config.indices = Mallocate(sizeof(u32) * config.index_count, MEMORY_TAG_ARRAY);
+    strcpy_s(config.name, 256, name);
+    strcpy_s(config.material_name, 256, material_name);
+
+    f32 half_width = width * 0.5f;
+    f32 half_height = height * 0.5f;
+    f32 half_depth = depth * 0.5f;
+
+    f32 min_x = -half_width;
+    f32 min_y = -half_height;
+    f32 max_x = half_width;
+    f32 max_y = half_height;
+    f32 min_z = -half_depth;
+    f32 max_z = half_depth;
+    f32 min_uv_x = 0.0f;
+    f32 min_uv_y = 0.0f;
+    f32 max_uv_x = tile_x;
+    f32 max_uv_y = tile_y;
+
+    vertex_3d* v_ptr = (vertex_3d*)config.vertices;
+
+    // Front face (Z = max_z)
+    v_ptr[(0 * 4) + 0].position = vect3_create(min_x, min_y, max_z); v_ptr[(0 * 4) + 0].texture = vect2_create(min_uv_x, min_uv_y); v_ptr[(0 * 4) + 0].normal = vect3_create(0.0f, 0.0f, 1.0f);
+    v_ptr[(0 * 4) + 1].position = vect3_create(max_x, min_y, max_z); v_ptr[(0 * 4) + 1].texture = vect2_create(max_uv_x, min_uv_y); v_ptr[(0 * 4) + 1].normal = vect3_create(0.0f, 0.0f, 1.0f);
+    v_ptr[(0 * 4) + 2].position = vect3_create(max_x, max_y, max_z); v_ptr[(0 * 4) + 2].texture = vect2_create(max_uv_x, max_uv_y); v_ptr[(0 * 4) + 2].normal = vect3_create(0.0f, 0.0f, 1.0f);
+    v_ptr[(0 * 4) + 3].position = vect3_create(min_x, max_y, max_z); v_ptr[(0 * 4) + 3].texture = vect2_create(min_uv_x, max_uv_y); v_ptr[(0 * 4) + 3].normal = vect3_create(0.0f, 0.0f, 1.0f);
+
+    // Back face (Z = min_z)
+    v_ptr[(1 * 4) + 0].position = vect3_create(max_x, min_y, min_z); v_ptr[(1 * 4) + 0].texture = vect2_create(min_uv_x, min_uv_y); v_ptr[(1 * 4) + 0].normal = vect3_create(0.0f, 0.0f, -1.0f);
+    v_ptr[(1 * 4) + 1].position = vect3_create(min_x, min_y, min_z); v_ptr[(1 * 4) + 1].texture = vect2_create(max_uv_x, min_uv_y); v_ptr[(1 * 4) + 1].normal = vect3_create(0.0f, 0.0f, -1.0f);
+    v_ptr[(1 * 4) + 2].position = vect3_create(min_x, max_y, min_z); v_ptr[(1 * 4) + 2].texture = vect2_create(max_uv_x, max_uv_y); v_ptr[(1 * 4) + 2].normal = vect3_create(0.0f, 0.0f, -1.0f);
+    v_ptr[(1 * 4) + 3].position = vect3_create(max_x, max_y, min_z); v_ptr[(1 * 4) + 3].texture = vect2_create(min_uv_x, max_uv_y); v_ptr[(1 * 4) + 3].normal = vect3_create(0.0f, 0.0f, -1.0f);
+
+    // Left face (X = min_x)
+    v_ptr[(2 * 4) + 0].position = vect3_create(min_x, min_y, min_z); v_ptr[(2 * 4) + 0].texture = vect2_create(min_uv_x, min_uv_y); v_ptr[(2 * 4) + 0].normal = vect3_create(-1.0f, 0.0f, 0.0f);
+    v_ptr[(2 * 4) + 1].position = vect3_create(min_x, min_y, max_z); v_ptr[(2 * 4) + 1].texture = vect2_create(max_uv_x, min_uv_y); v_ptr[(2 * 4) + 1].normal = vect3_create(-1.0f, 0.0f, 0.0f);
+    v_ptr[(2 * 4) + 2].position = vect3_create(min_x, max_y, max_z); v_ptr[(2 * 4) + 2].texture = vect2_create(max_uv_x, max_uv_y); v_ptr[(2 * 4) + 2].normal = vect3_create(-1.0f, 0.0f, 0.0f);
+    v_ptr[(2 * 4) + 3].position = vect3_create(min_x, max_y, min_z); v_ptr[(2 * 4) + 3].texture = vect2_create(min_uv_x, max_uv_y); v_ptr[(2 * 4) + 3].normal = vect3_create(-1.0f, 0.0f, 0.0f);
+
+    // Right face (X = max_x)
+    v_ptr[(3 * 4) + 0].position = vect3_create(max_x, min_y, max_z); v_ptr[(3 * 4) + 0].texture = vect2_create(min_uv_x, min_uv_y); v_ptr[(3 * 4) + 0].normal = vect3_create(1.0f, 0.0f, 0.0f);
+    v_ptr[(3 * 4) + 1].position = vect3_create(max_x, min_y, min_z); v_ptr[(3 * 4) + 1].texture = vect2_create(max_uv_x, min_uv_y); v_ptr[(3 * 4) + 1].normal = vect3_create(1.0f, 0.0f, 0.0f);
+    v_ptr[(3 * 4) + 2].position = vect3_create(max_x, max_y, min_z); v_ptr[(3 * 4) + 2].texture = vect2_create(max_uv_x, max_uv_y); v_ptr[(3 * 4) + 2].normal = vect3_create(1.0f, 0.0f, 0.0f);
+    v_ptr[(3 * 4) + 3].position = vect3_create(max_x, max_y, max_z); v_ptr[(3 * 4) + 3].texture = vect2_create(min_uv_x, max_uv_y); v_ptr[(3 * 4) + 3].normal = vect3_create(1.0f, 0.0f, 0.0f);
+
+    // Bottom face (Y = min_y)
+    v_ptr[(4 * 4) + 0].position = vect3_create(max_x, min_y, max_z); v_ptr[(4 * 4) + 0].texture = vect2_create(min_uv_x, min_uv_y); v_ptr[(4 * 4) + 0].normal = vect3_create(0.0f, -1.0f, 0.0f);
+    v_ptr[(4 * 4) + 1].position = vect3_create(min_x, min_y, max_z); v_ptr[(4 * 4) + 1].texture = vect2_create(max_uv_x, min_uv_y); v_ptr[(4 * 4) + 1].normal = vect3_create(0.0f, -1.0f, 0.0f);
+    v_ptr[(4 * 4) + 2].position = vect3_create(min_x, min_y, min_z); v_ptr[(4 * 4) + 2].texture = vect2_create(max_uv_x, max_uv_y); v_ptr[(4 * 4) + 2].normal = vect3_create(0.0f, -1.0f, 0.0f);
+    v_ptr[(4 * 4) + 3].position = vect3_create(max_x, min_y, min_z); v_ptr[(4 * 4) + 3].texture = vect2_create(min_uv_x, max_uv_y); v_ptr[(4 * 4) + 3].normal = vect3_create(0.0f, -1.0f, 0.0f);
+
+    // Top face (Y = max_y)
+    v_ptr[(5 * 4) + 0].position = vect3_create(min_x, max_y, max_z); v_ptr[(5 * 4) + 0].texture = vect2_create(min_uv_x, min_uv_y); v_ptr[(5 * 4) + 0].normal = vect3_create(0.0f, 1.0f, 0.0f);
+    v_ptr[(5 * 4) + 1].position = vect3_create(max_x, max_y, max_z); v_ptr[(5 * 4) + 1].texture = vect2_create(max_uv_x, min_uv_y); v_ptr[(5 * 4) + 1].normal = vect3_create(0.0f, 1.0f, 0.0f);
+    v_ptr[(5 * 4) + 2].position = vect3_create(max_x, max_y, min_z); v_ptr[(5 * 4) + 2].texture = vect2_create(max_uv_x, max_uv_y); v_ptr[(5 * 4) + 2].normal = vect3_create(0.0f, 1.0f, 0.0f);
+    v_ptr[(5 * 4) + 3].position = vect3_create(min_x, max_y, min_z); v_ptr[(5 * 4) + 3].texture = vect2_create(min_uv_x, max_uv_y); v_ptr[(5 * 4) + 3].normal = vect3_create(0.0f, 1.0f, 0.0f);
+
+    u32* i_ptr = (u32*)config.indices;
+    for (u32 i = 0; i < 6; ++i) {
+        u32 v_offset = i * 4;
+        u32 i_offset = i * 6;
+        i_ptr[i_offset + 0] = v_offset + 0; i_ptr[i_offset + 1] = v_offset + 1; i_ptr[i_offset + 2] = v_offset + 2;
+        i_ptr[i_offset + 3] = v_offset + 0; i_ptr[i_offset + 4] = v_offset + 2; i_ptr[i_offset + 5] = v_offset + 3;
+    }
+
     return config;
 }
