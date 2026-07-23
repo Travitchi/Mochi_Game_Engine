@@ -8,6 +8,7 @@
 #include "opengl_shader.h"
 #include "shader_system.h"
 #include "light_system.h"
+#include "camera_system.h"
 
 typedef struct opengl_geometry_data
 {
@@ -70,7 +71,7 @@ b8 opengl_backend_initialize(renderer_backend* backend, const char* application_
 
     state_ptr = (opengl_state*)Mallocate(sizeof(opengl_state), MEMORY_TAG_RENDERER);
     Mzero_memory(state_ptr, sizeof(opengl_state));
-	state_ptr->fov = deg_to_rad(90.0f);
+	state_ptr->fov = deg_to_rad(30.0f);
 	state_ptr->near_clip = 0.1f;
 	state_ptr->far_clip = 1000.0f;
     state_ptr->view = mat4_id();
@@ -187,7 +188,7 @@ void opengl_backend_resized(renderer_backend* backend, u16 width, u16 height)
     if (height != 0)
     {
         f32 aspect = (f32)width / (f32)height;
-        f32 fov = deg_to_rad(90.0f);
+        f32 fov = deg_to_rad(35.0f);
         state_ptr->projection = mat4_perspective(state_ptr->fov, aspect, state_ptr->near_clip, state_ptr->far_clip);
     }
 }
@@ -449,7 +450,9 @@ void opengl_backend_update_global_matrices(struct renderer_backend* backend, mat
         ubo_data.projection = projection;
         ubo_data.view = view;
         ubo_data.ambient_color = vect4_create(0.25f, 0.25f, 0.25f, 1.0f);
-        ubo_data.view_position = vect4_create(0.0f, 0.0f, 0.0f, 1.0f);
+        camera* active_cam = camera_system_get_default();
+        vect3 cam_pos = camera_position_get(active_cam);
+        ubo_data.view_position = vect4_create(cam_pos.x, cam_pos.y, cam_pos.z, 1.0f);
 
         directional_light* dir = light_system_get_directional();
         if (dir) ubo_data.dir_light = *dir;

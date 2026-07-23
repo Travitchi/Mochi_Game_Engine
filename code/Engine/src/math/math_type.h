@@ -103,3 +103,15 @@ typedef struct vertex_2d
 	vect2 position; 
 	vect2 texcoord; //texture coordinates spritesheet
 }vertex_2d;
+
+typedef struct transform 
+{
+	vect3 position;
+	vect3 rotation; // possibly a quaternion later
+	vect3 scale;
+
+	b8 is_dirty;
+
+	mat4 local;
+	struct transform* parent;
+} transform;

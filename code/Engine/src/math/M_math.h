@@ -651,9 +651,9 @@ MINLINE mat4 mat4_eulero_x(f32 angle_radians)
 	mat4 o_matrix = mat4_id();
 	f32 c = mcos(angle_radians);
 	f32 s = msin(angle_radians);
-	o_matrix.data[0] = c;
-	o_matrix.data[2] = s;
-	o_matrix.data[8] = -s;
+	o_matrix.data[5] = c;
+	o_matrix.data[6] = s;
+	o_matrix.data[9] = -s;
 	o_matrix.data[10] = c;
 	return o_matrix;
 }

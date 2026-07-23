@@ -12,6 +12,7 @@
 #include "material_systems.h"
 #include "geometry_systems.h"
 #include "resource_systems.h"
+#include "camera_system.h"
 #include "light_system.h"
 #include "image_loader.h"
 #include "text_loader.h"
@@ -125,6 +126,18 @@ KAPI b8 application_create(game* game_inst)
 	if (!renderer_initialize(game_inst->app_config.name, &app_state.platform)) 
 	{
 		MFATAL("Failed to initialize renderer. Shutting down.");
+		return FALSE;
+	}
+
+	//camera system startup
+	camera_system_config cam_sys_config = {};
+	cam_sys_config.max_camera_count = 61;
+	u64 camera_sys_memory_req = 0;
+	camera_system_initialize(&camera_sys_memory_req, 0, cam_sys_config);
+	void* camera_sys_state = Mallocate(camera_sys_memory_req, MEMORY_TAG_APPLICATION);
+	if (!camera_system_initialize(&camera_sys_memory_req, camera_sys_state, cam_sys_config))
+	{
+		MFATAL("Failed to initialize camera system.");
 		return FALSE;
 	}
 
@@ -316,10 +329,8 @@ KAPI b8 application_run()
 				frame_count++;
 			}
 
-
 			input_update(delta);
 			app_state.last_time = current_time;
-
 
 		}
 	}

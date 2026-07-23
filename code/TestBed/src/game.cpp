@@ -6,107 +6,60 @@
 #include <SDL_scancode.h>
 #include "event.h"
 
-//hack test
-void camera_recalculate_view_matrix(game_state* state)
+b8 game_initialize(game* game_inst) 
 {
-	mat4 rotation = mat4_eulero_xyz(state->camera_euler.x, state->camera_euler.y, state->camera_euler.z);
-	mat4 translation = mat4_translation(state->camera_position);
+    MDEBUG("game_initialize called!");
+    game_state* state = (game_state*)game_inst->state;
 
-	// FIX 1: Changed order to Translation * Rotation (First-Person local rotation)
-	mat4 world_transform = mat4_mult(translation, rotation);
-	state->view = mat4_inverse(world_transform);
-
-	renderer_set_view(state->view);
-}
-
-void camera_yaw(game_state* state, f32 amount)
-{
-	state->camera_euler.y += amount;
-	f32 full_circle = 2.0f * M_PI;
-	while (state->camera_euler.y > full_circle) { state->camera_euler.y -= full_circle; }
-	while (state->camera_euler.y < -full_circle) { state->camera_euler.y += full_circle; }
-
-	camera_recalculate_view_matrix(state);
-}
-
-void camera_pitch(game_state* state, f32 amount)
-{
-	state->camera_euler.x += amount;
-	f32 limit = deg_to_rad(89.0f);
-	if (state->camera_euler.x > limit) { state->camera_euler.x = limit; }
-	if (state->camera_euler.x < -limit) { state->camera_euler.x = -limit; }
-
-	camera_recalculate_view_matrix(state);
-}
-
-void camera_move_forward(game_state* state, f32 amount) {
-	mat4 rotation = mat4_eulero_xyz(state->camera_euler.x, state->camera_euler.y, state->camera_euler.z);
-	vect3 forward = mat4_forward(rotation);
-	forward = vect3_mult_scale(forward, amount);
-	state->camera_position = vect3_add(state->camera_position, forward);
-	camera_recalculate_view_matrix(state);
-}
-
-void camera_move_right(game_state* state, f32 amount) {
-	mat4 rotation = mat4_eulero_xyz(state->camera_euler.x, state->camera_euler.y, state->camera_euler.z);
-	vect3 right = mat4_right(rotation);
-	right = vect3_mult_scale(right, amount);
-	state->camera_position = vect3_add(state->camera_position, right);
-	camera_recalculate_view_matrix(state);
-}
-
-void camera_move_up(game_state* state, f32 amount) {
-	state->camera_position.y += amount;
-	camera_recalculate_view_matrix(state);
-}
-
-b8 game_initialize(game* game_inst)
-{
-	MDEBUG("game_initialize called!");
-	//test hack
-	game_state* state = (game_state*)game_inst->state;
-	state->camera_position = vect3{ 0.0f, 0.0f, 3.0f };
-	state->camera_euler = vect3{ 0.0f, 0.0f, 0.0f };
-	camera_recalculate_view_matrix(state);
-	return TRUE;
+    camera* active_cam = camera_system_get_default();
+    camera_position_set(active_cam, vect3{ 0.0f, 34.0f, 45.0f });
+    camera_rotation_set(active_cam, vect3{ -0.45f, 0.0f, 0.0f });
+    return TRUE;
 }
 
 b8 game_update(game* game_inst, f32 delta_time)
 {
-	//test hack
-	
-	game_state* state = (game_state*)game_inst->state;
-	f32 move_speed = 5.0f * delta_time;
-	f32 rotation_speed = 2.0f * delta_time;
+    game_state* state = (game_state*)game_inst->state;
 
-	// LOOKING (Arrow Keys)
-	if (input_is_key_pressed(SDL_SCANCODE_LEFT)) { camera_yaw(state, rotation_speed); }
-	if (input_is_key_pressed(SDL_SCANCODE_RIGHT)) { camera_yaw(state, -rotation_speed); }
-	if (input_is_key_pressed(SDL_SCANCODE_UP)) { camera_pitch(state, rotation_speed); }
-	if (input_is_key_pressed(SDL_SCANCODE_DOWN)) { camera_pitch(state, -rotation_speed); }
+   camera* active_cam = camera_system_get_default();
+    f32 move_speed = 10.0f * delta_time;
+    f32 rot_speed = 1.0f * delta_time;
 
-	// WALKING (W A S D)
-	if (input_is_key_pressed(SDL_SCANCODE_W)) { camera_move_forward(state, move_speed); }
-	if (input_is_key_pressed(SDL_SCANCODE_S)) { camera_move_forward(state, -move_speed); }
-	if (input_is_key_pressed(SDL_SCANCODE_A)) { camera_move_right(state, -move_speed); }
-	if (input_is_key_pressed(SDL_SCANCODE_D)) { camera_move_right(state, move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_LEFT)) { camera_yaw(active_cam, rot_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_RIGHT)) { camera_yaw(active_cam, -rot_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_UP)) { camera_pitch(active_cam, rot_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_DOWN)) { camera_pitch(active_cam, -rot_speed); }
 
-	// FLYING UP/DOWN (E / Q)
-	if (input_is_key_pressed(SDL_SCANCODE_E)) { camera_move_up(state, move_speed); }
-	if (input_is_key_pressed(SDL_SCANCODE_Q)) { camera_move_up(state, -move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_W)) { camera_move_forward(active_cam, move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_S)) { camera_move_backward(active_cam, move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_A)) { camera_move_left(active_cam, move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_D)) { camera_move_right(active_cam, move_speed); }
 
-	if (input_is_key_pressed(SDL_SCANCODE_T))
-	{
-		MDEBUG("Swapping texture!");
-		event_context context = {};
-		event_fire(0x10, game_inst, context);
-	}
-	//
-	return TRUE;
+    if (input_is_key_pressed(SDL_SCANCODE_SPACE)) { camera_move_up(active_cam, move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_LSHIFT)) { camera_move_down(active_cam, move_speed); }
+
+    if (input_is_key_pressed(SDL_SCANCODE_T))
+    {
+        MDEBUG("Swapping texture!");
+        event_context context = {};
+        event_fire(0x10, game_inst, context);
+    }
+
+    if (active_cam->is_dirty)
+    {
+        vect3 pos = camera_position_get(active_cam);
+        vect3 rot = camera_rotation_get(active_cam);
+
+        MINFO("Cam Pos [ X: %.2f | Y: %.2f | Z: %.2f ] || Rot [ P: %.2f | Y: %.2f ]",
+            pos.x, pos.y, pos.z, rot.x, rot.y);
+    }
+
+    return TRUE;
 }
 
 b8 game_render(game* game_inst, f32 delta_time)
 {
+    renderer_push_world_matrices();
 	return TRUE;
 }
 

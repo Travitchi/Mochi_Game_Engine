@@ -164,8 +164,10 @@
     <ClInclude Include="src\game_types.h" />
     <ClInclude Include="src\math\math_type.h" />
     <ClInclude Include="src\math\M_math.h" />
+    <ClInclude Include="src\math\M_transform.h" />
     <ClInclude Include="src\memory\dynamic_allocator.h" />
     <ClInclude Include="src\Platform\Platform.h" />
+    <ClInclude Include="src\renderer\camera.h" />
     <ClInclude Include="src\renderer\OpenGL\opengl_backend.h" />
     <ClInclude Include="src\renderer\OpenGL\opengl_image.h" />
     <ClInclude Include="src\renderer\OpenGL\opengl_shader.h" />
@@ -178,6 +180,7 @@
     <ClInclude Include="src\resources\loaders\shader_loader.h" />
     <ClInclude Include="src\resources\loaders\text_loader.h" />
     <ClInclude Include="src\resources\resource_types.h" />
+    <ClInclude Include="src\systems\camera_system.h" />
     <ClInclude Include="src\systems\geometry_systems.h" />
     <ClInclude Include="src\systems\light_system.h" />
     <ClInclude Include="src\systems\material_systems.h" />
@@ -196,9 +199,11 @@
     <ClCompile Include="src\core\logger.cpp" />
     <ClCompile Include="src\core\M_memory.cpp" />
     <ClCompile Include="src\math\M_math.cpp" />
+    <ClCompile Include="src\math\M_transform.cpp" />
     <ClCompile Include="src\memory\dynamic_allocator.cpp" />
     <ClCompile Include="src\Platform\glad.c" />
     <ClCompile Include="src\Platform\platform_SDL2.cpp" />
+    <ClCompile Include="src\renderer\camera.cpp" />
     <ClCompile Include="src\renderer\OpenGL\opengl_backend.cpp" />
     <ClCompile Include="src\renderer\OpenGL\opengl_image.cpp" />
     <ClCompile Include="src\renderer\OpenGL\opengl_shader.cpp" />
@@ -208,6 +213,7 @@
     <ClCompile Include="src\resources\loaders\material_loader.cpp" />
     <ClCompile Include="src\resources\loaders\shader_loader.cpp" />
     <ClCompile Include="src\resources\loaders\text_loader.cpp" />
+    <ClCompile Include="src\systems\camera_system.cpp" />
     <ClCompile Include="src\systems\geometry_systems.cpp" />
     <ClCompile Include="src\systems\light_system.cpp" />
     <ClCompile Include="src\systems\material_systems.cpp" />

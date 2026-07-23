@@ -11,6 +11,8 @@
 #include "material_systems.h"
 #include "geometry_systems.h"
 #include "shader_system.h"
+#include "camera_system.h"
+#include "M_transform.h"
 
 static renderer_backend* backend = 0;
 static geometry* test_geometry = 0;
@@ -82,6 +84,7 @@ b8 renderer_initialize(const char* application_name, struct platform_state* plat
     }
 
     event_register(0x10, 0, event_on_debug_event);
+    renderer_on_resize(1280, 720);
     return TRUE;
 }
 
@@ -100,7 +103,7 @@ void renderer_on_resize(u16 width, u16 height)
 {
     if (height != 0)
     {
-        world_projection = mat4_perspective(deg_to_rad(90.0f), (f32)width / (f32)height, 0.1f, 1000.0f);
+        world_projection = mat4_perspective(deg_to_rad(30.0f), (f32)width / (f32)height, 0.1f, 1000.0f);
     }
     if (backend) 
     {
@@ -193,11 +196,12 @@ void renderer_draw_test_geometry()
 
         geometry_render_data data = {};
         data.geometry = test_geometry;
-        static f32 angle = 0.0f;
-        angle += 0.0005f;
-        mat4 rotation = mat4_eulero_xyz(angle * 0.5f, angle, 0.0f);
-        mat4 translation = mat4_translation(vect3_create(0.0f, 0.0f, -20.0f));
-        data.model = mat4_mult(rotation, translation);
+        static transform test_transform = transform_from_position(vect3_create(0.0f, 0.0f, -20.0f));
+       // static f32 angle = 0.0f;
+        //angle += 0.0005f;
+        //transform_rotation_set(&test_transform, vect3_create(angle * 0.5f, angle, 0.0f));
+        data.model = transform_get_world(&test_transform);
+        
         shader* obj_shader = shader_system_get("M_object_shader");
         shader_system_use("M_object_shader");
         shader_system_set_uniform(obj_shader, "u_push.model", &data.model);
@@ -247,10 +251,12 @@ void renderer_update_global_matrices(mat4 projection, mat4 view)
     }
 }
 
-void renderer_push_world_matrices()
+void renderer_push_world_matrices() 
 {
-    if (backend && backend->update_global_matrices) 
+    if (backend && backend->update_global_matrices)
     {
-        backend->update_global_matrices(backend, world_projection, world_view);
+        camera* active_camera = camera_system_get_default();
+        mat4 view = camera_view_get(active_camera);
+        backend->update_global_matrices(backend, world_projection, view);
     }
 }
