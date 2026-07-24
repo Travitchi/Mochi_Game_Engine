@@ -14,6 +14,24 @@ void camera_reset(camera* c)
     c->euler_rotation = vect3_create(0.0f, 0.0f, 0.0f);
     c->is_dirty = FALSE;
     c->view_matrix = mat4_id();
+    c->fov = deg_to_rad(30.0f);
+}
+
+f32 camera_fov_get(const camera* c) 
+{
+    return c ? c->fov : deg_to_rad(60.0f);
+}
+
+void camera_zoom_add(camera* c, f32 amount) 
+{
+    if (c) 
+    {
+        c->fov += amount;
+        f32 min_fov = deg_to_rad(15.0f);
+        f32 max_fov = deg_to_rad(45.0f);
+        if (c->fov < min_fov) c->fov = min_fov;
+        if (c->fov > max_fov) c->fov = max_fov;
+    }
 }
 
 vect3 camera_position_get(const camera* c) 
@@ -58,21 +76,25 @@ mat4 camera_view_get(camera* c)
     return c ? c->view_matrix : mat4_id();
 }
 
-void camera_move_forward(camera* c, f32 amount) 
+void camera_move_forward_planar(camera* c, f32 amount) 
 {
     if (c) 
     {
         mat4 rotation = mat4_eulero_xyz(c->euler_rotation.x, c->euler_rotation.y, c->euler_rotation.z);
         vect3 forward = mat4_forward(rotation);
+
+        forward.y = 0.0f;
+        vect3_normalize(&forward);
+
         forward = vect3_mult_scale(forward, amount);
         c->position = vect3_add(c->position, forward);
         c->is_dirty = TRUE;
     }
 }
 
-void camera_move_backward(camera* c, f32 amount)
+void camera_move_backward_planar(camera* c, f32 amount)
 {
-    camera_move_forward(c, -amount);
+    camera_move_forward_planar(c, -amount);
 }
 
 void camera_move_left(camera* c, f32 amount)
@@ -122,6 +144,20 @@ void camera_pitch(camera* c, f32 amount)
         c->euler_rotation.x += amount;
         if (c->euler_rotation.x > 1.57f) c->euler_rotation.x = 1.57f;
         if (c->euler_rotation.x < -1.57f) c->euler_rotation.x = -1.57f;
+        c->is_dirty = TRUE;
+    }
+}
+
+void camera_follow_target(camera* c, vect3 target_position, vect3 offset, f32 damping, f32 delta_time)
+{
+    if (c) 
+    {
+        vect3 desired_position = vect3_add(target_position, offset);
+        f32 t = damping * delta_time;
+        if (t > 1.0f) t = 1.0f;
+        c->position.x += (desired_position.x - c->position.x) * t;
+        c->position.y += (desired_position.y - c->position.y) * t;
+        c->position.z += (desired_position.z - c->position.z) * t;
         c->is_dirty = TRUE;
     }
 }

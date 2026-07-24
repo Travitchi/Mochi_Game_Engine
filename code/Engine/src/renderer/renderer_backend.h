@@ -16,8 +16,8 @@ typedef struct renderer_backend
     void (*resized)(struct renderer_backend* backend, u16 width, u16 height);
     b8(*begin_frame)(struct renderer_backend* backend, f32 delta_time);
     b8(*end_frame)(struct renderer_backend* backend, f32 delta_time);
-    b8(*begin_render_pass)(struct renderer_backend* backend, u8 pass_id);
-    void (*end_render_pass)(struct renderer_backend* backend, u8 pass_id);
+    b8(*begin_render_pass)(struct renderer_backend* backend, struct render_pass* pass, struct render_target* target);
+    void (*end_render_pass)(struct renderer_backend* backend, struct render_pass* pass);
     void (*update_object)(struct renderer_backend* backend, geometry_render_data data);
     void (*set_projection_params)(struct renderer_backend* backend, f32 fov_radians, f32 near_clip, f32 far_clip);
     void (*set_view)(struct renderer_backend* backend, mat4 view);
@@ -30,4 +30,6 @@ typedef struct renderer_backend
     b8(*shader_use)(struct renderer_backend* backend, struct shader* shader);
     b8(*shader_set_uniform)(struct renderer_backend* backend, struct shader* shader, u16 index, void* value);
     void (*update_global_matrices)(struct renderer_backend* backend, mat4 projection, mat4 view);
+    void (*render_target_create)(struct renderer_backend* backend, u32 attachment_count, struct texture** attachments, struct render_target* out_target);
+    void (*render_target_destroy)(struct renderer_backend* backend, struct render_target* target);
 } renderer_backend;

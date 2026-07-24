@@ -188,7 +188,6 @@ void opengl_backend_resized(renderer_backend* backend, u16 width, u16 height)
     if (height != 0)
     {
         f32 aspect = (f32)width / (f32)height;
-        f32 fov = deg_to_rad(35.0f);
         state_ptr->projection = mat4_perspective(state_ptr->fov, aspect, state_ptr->near_clip, state_ptr->far_clip);
     }
 }
@@ -289,6 +288,14 @@ void opengl_backend_create_texture(struct renderer_backend* backend, const char*
 
     opengl_image* internal_data = (opengl_image*)Mallocate(sizeof(opengl_image), MEMORY_TAG_RENDERER);
     u32 format = GL_RGBA;
+    if (channel_count == 1)
+    {
+        format = GL_DEPTH_COMPONENT24;
+    }
+    else if (channel_count == 3)
+    {
+        format = GL_RGB;
+    }
     opengl_image_create(width, height, format, TRUE, internal_data);
 
     if (pixels)
@@ -365,39 +372,66 @@ void opengl_backend_destroy_geometry(struct renderer_backend* backend, geometry*
     }
 }
 
-b8 opengl_backend_begin_render_pass(struct renderer_backend* backend, u8 pass_id)
+b8 opengl_backend_begin_render_pass(renderer_backend* backend, struct render_pass* pass, struct render_target* target)
 {
-    switch (pass_id)
+    if (!pass || !target) 
     {
-    case BUILTIN_RENDER_PASS_WORLD:
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        break;
-
-    case BUILTIN_RENDER_PASS_UI:
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        break;
-
-    default:
-        MERROR("opengl_backend_begin_render_pass called with unrecognized pass_id: %d", pass_id);
+        MERROR("opengl_backend_begin_render_pass requires valid pass and target pointers.");
         return FALSE;
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, target->internal_fbo_id);
+    glViewport((GLint)pass->render_area_x, (GLint)pass->render_area_y, (GLsizei)pass->render_area_w, (GLsizei)pass->render_area_h);
+    glScissor((GLint)pass->render_area_x, (GLint)pass->render_area_y, (GLsizei)pass->render_area_w, (GLsizei)pass->render_area_h);
+    if (pass->depth_test_enabled)
+    {
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+    }
+    else 
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
+
+    if (pass->blend_enabled)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
+
+    GLbitfield clear_bits = 0;
+    if (pass->clear_flags & RENDER_PASS_CLEAR_COLOR_BUFFER_FLAG) 
+    {
+        clear_bits |= GL_COLOR_BUFFER_BIT;
+        glClearColor(pass->clear_color.x, pass->clear_color.y, pass->clear_color.z, pass->clear_color.w);
+    }
+    if (pass->clear_flags & RENDER_PASS_CLEAR_DEPTH_BUFFER_FLAG)
+    {
+        clear_bits |= GL_DEPTH_BUFFER_BIT;
+    }
+    if (pass->clear_flags & RENDER_PASS_CLEAR_STENCIL_BUFFER_FLAG)
+    {
+        clear_bits |= GL_STENCIL_BUFFER_BIT;
+    }
+
+    if (clear_bits != 0) 
+    {
+        glClear(clear_bits);
+    }
+
     return TRUE;
 }
 
-void opengl_backend_end_render_pass(struct renderer_backend* backend, u8 pass_id)
+void opengl_backend_end_render_pass(renderer_backend* backend, struct render_pass* pass)
 {
-    if (pass_id == BUILTIN_RENDER_PASS_UI)
-    {
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glDisable(GL_BLEND);
 }
 
 b8 opengl_backend_shader_create(struct renderer_backend* backend, struct shader* shader, const struct shader_config* config) 
@@ -469,5 +503,74 @@ void opengl_backend_update_global_matrices(struct renderer_backend* backend, mat
         }
 
         render_buffer_load_data(&state_ptr->global_ubo, 0, sizeof(global_uniform_data), &ubo_data);
+    }
+}
+
+void opengl_backend_render_target_create(struct renderer_backend* backend, u32 attachment_count, struct texture** attachments, struct render_target* out_target)
+{
+    if (!out_target || attachment_count == 0 || !attachments) 
+    {
+        MERROR("opengl_backend_render_target_create requires valid target and attachments.");
+        return;
+    }
+
+    out_target->color_attachment = 0;
+    out_target->depth_attachment = 0;
+
+    glGenFramebuffers(1, &out_target->internal_fbo_id);
+    glBindFramebuffer(GL_FRAMEBUFFER, out_target->internal_fbo_id);
+    for (u32 i = 0; i < attachment_count; ++i)
+    {
+        texture* tex = attachments[i];
+        if (!tex || !tex->internal_data) continue;
+
+        opengl_image* img = (opengl_image*)tex->internal_data;
+
+        if (img->format == GL_DEPTH_COMPONENT || img->format == GL_DEPTH_COMPONENT24 || img->format == GL_DEPTH24_STENCIL8) 
+        {
+            GLenum attachment_type = (img->format == GL_DEPTH24_STENCIL8) ? GL_DEPTH_STENCIL_ATTACHMENT : GL_DEPTH_ATTACHMENT;
+            glFramebufferTexture2D(GL_FRAMEBUFFER, attachment_type, GL_TEXTURE_2D, img->handle, 0);
+            out_target->depth_attachment = tex;
+        }
+        else 
+        {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, img->handle, 0);
+            out_target->color_attachment = tex;
+        }
+    }
+
+    if (out_target->color_attachment) 
+    {
+        GLenum draw_buffers[1] = { GL_COLOR_ATTACHMENT0 };
+        glDrawBuffers(1, draw_buffers);
+    }
+    else 
+    {
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+    }
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        MFATAL("Framebuffer Object failed to complete! Status: 0x%x", status);
+    }
+    else 
+    {
+        MINFO("Successfully generated offscreen render target (FBO ID: %u)", out_target->internal_fbo_id);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void opengl_backend_render_target_destroy(struct renderer_backend* backend, struct render_target* target)
+{
+    if (target && target->internal_fbo_id > 0)
+    {
+        MINFO("Destroying render target (FBO ID: %u)", target->internal_fbo_id);
+        glDeleteFramebuffers(1, &target->internal_fbo_id);
+        target->internal_fbo_id = 0;
+        target->color_attachment = 0;
+        target->depth_attachment = 0;
     }
 }

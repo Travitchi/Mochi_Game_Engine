@@ -147,6 +147,7 @@ KAPI b8 application_create(game* game_inst)
 		MFATAL("Failed to initialize light system.");
 		return FALSE;
 	}
+
 	//test lights
 	light_system_add_point_light(vect4_create(0.0f, 1.0f, 0.0f, 1.0f), vect3_create(15.0f, 5.0f, -15.0f), 1.0f, 0.09f, 0.032f);
 	light_system_add_point_light(vect4_create(5.0f, 0.0f, 0.0f, 1.0f), vect3_create(-15.0f, 5.0f, -15.0f), 1.0f, 0.09f, 0.032f);
@@ -291,14 +292,18 @@ KAPI b8 application_run()
 
 			if (renderer_begin_frame(&packet))
 			{
-				if (renderer_begin_render_pass(BUILTIN_RENDER_PASS_WORLD))
+				render_target* screen_target = renderer_window_target_get();
+				render_pass* world_pass = renderer_render_pass_get("Builtin.RenderPass.World");
+				render_pass* ui_pass = renderer_render_pass_get("Builtin.RenderPass.UI");
+
+				if (renderer_begin_render_pass(world_pass, screen_target))
 				{
 					renderer_push_world_matrices();
 					renderer_draw_test_geometry();
-					renderer_end_render_pass(BUILTIN_RENDER_PASS_WORLD);
+					renderer_end_render_pass(world_pass);
 				}
-				/*
-				if (renderer_begin_render_pass(BUILTIN_RENDER_PASS_UI))
+/*
+				if (renderer_begin_render_pass(ui_pass, screen_target))
 				{
 					renderer_update_global_matrices(ui_projection, ui_view);
 					shader* ui_shader = shader_system_get("M_ui_shader");
@@ -306,9 +311,9 @@ KAPI b8 application_run()
 					mat4 ui_model = mat4_id();
 					shader_system_set_uniform(ui_shader, "u_push.model", &ui_model);
 					renderer_draw_geometry(my_ui_image);
-					renderer_end_render_pass(BUILTIN_RENDER_PASS_UI);
+					renderer_end_render_pass(ui_pass);
 				}
-				*/
+*/
 				renderer_end_frame(&packet);
 			}
 

@@ -7,6 +7,7 @@
 #include "M_math.h"
 #include "event.h"
 #include <stdio.h>
+#include <string.h>
 #include "texture_systems.h"
 #include "material_systems.h"
 #include "geometry_systems.h"
@@ -18,6 +19,12 @@ static renderer_backend* backend = 0;
 static geometry* test_geometry = 0;
 static mat4 world_projection = mat4_id();
 static mat4 world_view = mat4_id();
+static render_target window_target = {};
+static render_pass registered_passes[10];
+static u32 registered_pass_count = 0;
+static render_target world_offscreen_target = {};
+static texture offscreen_color_tex = {};
+static texture offscreen_depth_tex = {};
 
 
 b8 event_on_debug_event(u16 code, void* sender, void* listener_inst, event_context context)
@@ -44,6 +51,22 @@ b8 event_on_debug_event(u16 code, void* sender, void* listener_inst, event_conte
 
     return TRUE;
 }
+
+static b8 create_render_pass(const render_pass_config* config, render_pass* out_pass)
+{
+    out_pass->id = registered_pass_count++;
+    strcpy_s(out_pass->name, 256, config->name);
+    out_pass->render_area_x = config->render_area_x;
+    out_pass->render_area_y = config->render_area_y;
+    out_pass->render_area_w = config->render_area_w;
+    out_pass->render_area_h = config->render_area_h;
+    out_pass->clear_color = config->clear_color;
+    out_pass->clear_flags = config->clear_flags;
+    out_pass->depth_test_enabled = config->depth_test_enabled;
+    out_pass->blend_enabled = config->blend_enabled;
+    return TRUE;
+}
+
 
 
 b8 renderer_initialize(const char* application_name, struct platform_state* plat_state)
@@ -76,11 +99,55 @@ b8 renderer_initialize(const char* application_name, struct platform_state* plat
     backend->shader_use = opengl_backend_shader_use;
     backend->shader_set_uniform = opengl_backend_shader_set_uniform;
     backend->update_global_matrices = opengl_backend_update_global_matrices;
+    backend->render_target_create = opengl_backend_render_target_create;
+    backend->render_target_destroy = opengl_backend_render_target_destroy;
 
     if (!backend->initialize(backend, application_name, plat_state))
     {
         MFATAL("Renderer backend failed to initialize!");
         return FALSE;
+    }
+
+
+    window_target.id = 0;
+    window_target.internal_fbo_id = 0;
+    window_target.color_attachment = 0;
+    window_target.depth_attachment = 0;
+
+    //Configure the WORLD Render Pass
+    render_pass_config world_config = {};
+    strcpy_s(world_config.name, 256, "Builtin.RenderPass.World");
+    world_config.render_area_x = 0;
+    world_config.render_area_y = 0;
+    world_config.render_area_w = 1280;
+    world_config.render_area_h = 720;
+    world_config.clear_color = vect4_create(0.1f, 0.1f, 0.12f, 1.0f);
+    world_config.clear_flags = RENDER_PASS_CLEAR_COLOR_BUFFER_FLAG | RENDER_PASS_CLEAR_DEPTH_BUFFER_FLAG;
+    world_config.depth_test_enabled = TRUE;
+    world_config.blend_enabled = FALSE;
+    create_render_pass(&world_config, &registered_passes[0]);
+
+    //Configure the UI Render Pass
+    render_pass_config ui_config = {};
+    strcpy_s(ui_config.name, 256, "Builtin.RenderPass.UI");
+    ui_config.render_area_x = 0;
+    ui_config.render_area_y = 0;
+    ui_config.render_area_w = 1280;
+    ui_config.render_area_h = 720;
+    ui_config.clear_color = vect4_create(0.0f, 0.0f, 0.0f, 0.0f);
+    ui_config.clear_flags = RENDER_PASS_CLEAR_NONE_FLAG;
+    ui_config.depth_test_enabled = FALSE;
+    ui_config.blend_enabled = TRUE;
+    create_render_pass(&ui_config, &registered_passes[1]);
+
+    //blank textures for offscreen rendering
+    renderer_create_texture("world_color_buffer", FALSE, 1280, 720, 4, nullptr, FALSE, &offscreen_color_tex);
+    renderer_create_texture("world_depth_buffer", FALSE, 1280, 720, 1, nullptr, FALSE, &offscreen_depth_tex);
+    //Combine them into an offscreen FBO render target!
+    texture* attachments[2] = { &offscreen_color_tex, &offscreen_depth_tex };
+    if (backend && backend->render_target_create)
+    {
+        backend->render_target_create(backend, 2, attachments, &world_offscreen_target);
     }
 
     event_register(0x10, 0, event_on_debug_event);
@@ -105,6 +172,13 @@ void renderer_on_resize(u16 width, u16 height)
     {
         world_projection = mat4_perspective(deg_to_rad(30.0f), (f32)width / (f32)height, 0.1f, 1000.0f);
     }
+
+    for (u32 i = 0; i < registered_pass_count; ++i)
+    {
+        registered_passes[i].render_area_w = (f32)width;
+        registered_passes[i].render_area_h = (f32)height;
+    }
+
     if (backend) 
     {
         backend->resized(backend, width, height);
@@ -150,14 +224,36 @@ void renderer_destroy_geometry(geometry* geometry)
     }
 }
 
-b8 renderer_begin_render_pass(u8 pass_id)
+b8 renderer_begin_render_pass(struct render_pass* pass, struct render_target* target)
 {
-    return backend->begin_render_pass(backend, pass_id);
+    return backend->begin_render_pass(backend, pass, target);
 }
 
-void renderer_end_render_pass(u8 pass_id)
+void renderer_end_render_pass(struct render_pass* pass)
 {
-    backend->end_render_pass(backend, pass_id);
+    backend->end_render_pass(backend, pass);
+}
+
+struct render_pass* renderer_render_pass_get(const char* name)
+{
+    for (u32 i = 0; i < registered_pass_count; ++i) 
+    {
+        if (strcmp(registered_passes[i].name, name) == 0)
+        {
+            return &registered_passes[i];
+        }
+    }
+    return 0;
+}
+
+struct render_target* renderer_window_target_get()
+{
+    return &window_target;
+}
+
+struct render_target* renderer_world_target_get()
+{
+    return &world_offscreen_target;
 }
 
 b8 renderer_begin_frame(render_packet* packet)

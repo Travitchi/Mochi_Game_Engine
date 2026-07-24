@@ -30,8 +30,8 @@ b8 game_update(game* game_inst, f32 delta_time)
     if (input_is_key_pressed(SDL_SCANCODE_UP)) { camera_pitch(active_cam, rot_speed); }
     if (input_is_key_pressed(SDL_SCANCODE_DOWN)) { camera_pitch(active_cam, -rot_speed); }
 
-    if (input_is_key_pressed(SDL_SCANCODE_W)) { camera_move_forward(active_cam, move_speed); }
-    if (input_is_key_pressed(SDL_SCANCODE_S)) { camera_move_backward(active_cam, move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_W)) { camera_move_forward_planar(active_cam, move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_S)) { camera_move_backward_planar(active_cam, move_speed); }
     if (input_is_key_pressed(SDL_SCANCODE_A)) { camera_move_left(active_cam, move_speed); }
     if (input_is_key_pressed(SDL_SCANCODE_D)) { camera_move_right(active_cam, move_speed); }
 
@@ -45,7 +45,7 @@ b8 game_update(game* game_inst, f32 delta_time)
         event_fire(0x10, game_inst, context);
     }
 
-    if (active_cam->is_dirty)
+   /* if (active_cam->is_dirty)
     {
         vect3 pos = camera_position_get(active_cam);
         vect3 rot = camera_rotation_get(active_cam);
@@ -53,7 +53,7 @@ b8 game_update(game* game_inst, f32 delta_time)
         MINFO("Cam Pos [ X: %.2f | Y: %.2f | Z: %.2f ] || Rot [ P: %.2f | Y: %.2f ]",
             pos.x, pos.y, pos.z, rot.x, rot.y);
     }
-
+    */
     return TRUE;
 }
 

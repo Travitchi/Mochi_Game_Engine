@@ -30,8 +30,18 @@ void opengl_image_create(u32 width, u32 height, u32 format, b32 create_view, ope
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    u32 ext_format = GL_RGBA;
+    if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24 || format == GL_DEPTH24_STENCIL8)
+    {
+        ext_format = GL_DEPTH_COMPONENT;
+    }
+    else if (format == GL_RGB)
+    {
+        ext_format = GL_RGB;
+    }
+
     u32 data_type = (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_COMPONENT24) ? GL_FLOAT : GL_UNSIGNED_BYTE;
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, data_type, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, ext_format, data_type, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     if (create_view) 

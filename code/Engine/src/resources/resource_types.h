@@ -92,3 +92,46 @@ typedef struct image_resource_data
     u32 height;
     u8* pixels;
 } image_resource_data;
+
+typedef enum render_pass_clear_flags
+{
+    RENDER_PASS_CLEAR_NONE_FLAG = 0x00,
+    RENDER_PASS_CLEAR_COLOR_BUFFER_FLAG = 0x01,
+    RENDER_PASS_CLEAR_DEPTH_BUFFER_FLAG = 0x02,
+    RENDER_PASS_CLEAR_STENCIL_BUFFER_FLAG = 0x04
+} render_pass_clear_flags;
+
+typedef struct render_target 
+{
+    u32 id;
+    u32 internal_fbo_id;
+    struct texture* color_attachment;
+    struct texture* depth_attachment;
+} render_target;
+
+typedef struct render_pass_config
+{
+    char name[256];
+    f32 render_area_x;
+    f32 render_area_y;
+    f32 render_area_w;
+    f32 render_area_h;
+    vect4 clear_color;
+    u8 clear_flags;
+    b8 depth_test_enabled;
+    b8 blend_enabled;
+} render_pass_config;
+
+typedef struct render_pass 
+{
+    u32 id;
+    char name[256];
+    f32 render_area_x;
+    f32 render_area_y;
+    f32 render_area_w;
+    f32 render_area_h;
+    vect4 clear_color;
+    u8 clear_flags;
+    b8 depth_test_enabled;
+    b8 blend_enabled;
+} render_pass;
