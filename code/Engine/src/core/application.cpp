@@ -20,6 +20,7 @@
 #include "shader_system.h"
 #include "shader_loader.h"
 #include <string.h>
+#include "M_transform.h"
 
 typedef struct application_state
 {
@@ -44,6 +45,9 @@ typedef struct application_state
 
 static b8 initialized = FALSE;  //safety check
 static application_state app_state;
+static geometry* scene_cube = 0;
+static geometry* scene_floor = 0;
+static geometry_render_data world_geometries[2];
 
 //event handlers
 b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context);
@@ -97,14 +101,7 @@ KAPI b8 application_create(game* game_inst)
 	event_register(EVENT_CODE_KEY_PRESSED, 0, application_on_key);
 	event_register(EVENT_CODE_RESIZED, 0, application_on_resize);
 
-	if (!platform_initialize(
-		&app_state.platform,
-		game_inst->app_config.name,
-		game_inst->app_config.start_pos_x,
-		game_inst->app_config.start_pos_y,
-		game_inst->app_config.start_width,
-		game_inst->app_config.start_height)
-		)
+	if (!platform_initialize(&app_state.platform, game_inst->app_config.name, game_inst->app_config.start_pos_x, game_inst->app_config.start_pos_y, game_inst->app_config.start_width, game_inst->app_config.start_height))
 	{
 		return FALSE;
 	}
@@ -149,8 +146,8 @@ KAPI b8 application_create(game* game_inst)
 	}
 
 	//test lights
-	light_system_add_point_light(vect4_create(0.0f, 1.0f, 0.0f, 1.0f), vect3_create(15.0f, 5.0f, -15.0f), 1.0f, 0.09f, 0.032f);
-	light_system_add_point_light(vect4_create(5.0f, 0.0f, 0.0f, 1.0f), vect3_create(-15.0f, 5.0f, -15.0f), 1.0f, 0.09f, 0.032f);
+	light_system_add_point_light(vect4_create(2.0f, 0.5f, 0.5f, 1.0f), vect3_create(10.0f, 10.0f, -8.0f), 1.0f, 0.0f, 0.001f);
+	light_system_add_point_light(vect4_create(0.5f, 1.0f, 0.5f, 1.0f), vect3_create(-10.0f, 10.0f, -8.0f), 1.0f, 0.0f, 0.001f);
 
 	//texture system startup
 	texture_system_config tex_config;
@@ -183,6 +180,14 @@ KAPI b8 application_create(game* game_inst)
 		resource_system_unload(&ui_shader_res);
 	}
 
+	resource shadow_shader_res;
+	if (resource_system_load("M_shadow_shader", RESOURCE_TYPE_SHADER, &shadow_shader_res))
+	{
+		shader out_s;
+		shader_system_create_shader((const struct shader_config*)shadow_shader_res.data, &out_s);
+		resource_system_unload(&shadow_shader_res);
+	}
+
 	//material system startup
 	material_system_config mat_config;
 	mat_config.max_material_count = 4096;
@@ -211,6 +216,18 @@ KAPI b8 application_create(game* game_inst)
 	}
 
 	app_state.game_inst->on_resize(app_state.game_inst, app_state.width, app_state.height);
+	
+
+	//test code cube and floor
+	geometry_config cube_config = geometry_system_generate_cube_config(4.0f, 4.0f, 4.0f, 1.0f, 1.0f, "test_cube", "test_mat_1");
+	scene_cube = geometry_system_acquire_from_config(cube_config, TRUE);
+	Mfree(cube_config.vertices, cube_config.vertex_size * cube_config.vertex_count, MEMORY_TAG_ARRAY);
+	Mfree(cube_config.indices, cube_config.index_size * cube_config.index_count, MEMORY_TAG_ARRAY);
+
+	geometry_config floor_config = geometry_system_generate_plane_config(30.0f, 30.0f, 5, 5, 5.0f, 5.0f, "test_floor", "test_mat_2");
+	scene_floor = geometry_system_acquire_from_config(floor_config, TRUE);
+	Mfree(floor_config.vertices, floor_config.vertex_size * floor_config.vertex_count, MEMORY_TAG_ARRAY);
+	Mfree(floor_config.indices, floor_config.index_size * floor_config.index_count, MEMORY_TAG_ARRAY);
 
 	initialized = TRUE;
 	return TRUE;
@@ -253,6 +270,20 @@ KAPI b8 application_run()
 	geometry_render_data my_ui_image = {};
 	my_ui_image.geometry = geometry_system_acquire_from_config(ui_config, TRUE);
 	my_ui_image.model = mat4_translation(vect3_create(10.0f, 10.0f, 0.0f));
+	//cube
+	geometry_config cube_config = geometry_system_generate_cube_config(4.0f, 4.0f, 4.0f, 1.0f, 1.0f, "test_cube", "test_mat_1");
+	geometry* cube_geom = geometry_system_acquire_from_config(cube_config, TRUE);
+	Mfree(cube_config.vertices, cube_config.vertex_size * cube_config.vertex_count, MEMORY_TAG_ARRAY);
+	Mfree(cube_config.indices, cube_config.index_size * cube_config.index_count, MEMORY_TAG_ARRAY);
+	//floor
+	geometry_config floor_config = geometry_system_generate_plane_config(30.0f, 30.0f, 5, 5, 5.0f, 5.0f, "test_floor", "test_mat_2");
+	geometry* floor_geom = geometry_system_acquire_from_config(floor_config, TRUE);
+	Mfree(floor_config.vertices, floor_config.vertex_size * floor_config.vertex_count, MEMORY_TAG_ARRAY);
+	Mfree(floor_config.indices, floor_config.index_size * floor_config.index_count, MEMORY_TAG_ARRAY);
+	//Store them in an array to pass into render packet
+	geometry_render_data world_geometries[2] = {};
+	world_geometries[0].geometry = floor_geom;
+	world_geometries[1].geometry = cube_geom;
 	while (app_state.is_run)
 	{
 		
@@ -284,36 +315,92 @@ KAPI b8 application_run()
 			//todo: refactor packet creation
 			render_packet packet = {};
 			packet.delta_time = delta;
-			packet.geometry_count = 0;
-			packet.ui_geometry_count = 0;
+			transform floor_transform = transform_from_position(vect3_create(0.0f, 0.0f, 0.0f));
+			transform_rotation_set(&floor_transform, vect3_create(deg_to_rad(-90.0f), 0.0f, 0.0f));
+			world_geometries[0].geometry = scene_floor; // <-- Explicitly re-assigned!
+			world_geometries[0].model = transform_get_world(&floor_transform);
 
-			vertex_2d ui_verts[4] = {{ {0.0f,   0.0f},   {0.0f, 1.0f} },{ {100.0f, 0.0f},   {1.0f, 1.0f} },{ {100.0f, 100.0f}, {1.0f, 0.0f} },{ {0.0f,   100.0f}, {0.0f, 0.0f} }};
-			u32 ui_indices[6] = { 2, 1, 0, 3, 2, 0 };
+			// 2. Cube: Placed at Y = 1.0f (exactly 2 units above floor), spinning horizontally
+			static f32 cube_angle = 0.0f;
+			cube_angle += 1.0f * (f32)delta;
+			transform cube_transform = transform_from_position(vect3_create(0.0f, 3.0f, 0.0f));
+			transform_rotation_set(&cube_transform, vect3_create(0.0f, cube_angle, 0.0f)); // Spin on Y-axis only
+			world_geometries[1].geometry = scene_cube; // <-- Explicitly re-assigned!
+			world_geometries[1].model = transform_get_world(&cube_transform);
+
+			packet.geometry_count = 2;
+			packet.geometries = world_geometries;
+			packet.ui_geometry_count = 0;
 
 			if (renderer_begin_frame(&packet))
 			{
 				render_target* screen_target = renderer_window_target_get();
+				render_target* shadow_target = renderer_shadow_target_get();
 				render_pass* world_pass = renderer_render_pass_get("Builtin.RenderPass.World");
+				render_pass* shadow_pass = renderer_render_pass_get("Builtin.RenderPass.Shadow");
 				render_pass* ui_pass = renderer_render_pass_get("Builtin.RenderPass.UI");
+
+				renderer_sort_geometries(packet.geometries, packet.geometry_count, TRUE);
+
+				vect3 sun_dir = vect3_create(-0.8f, -10.0f, -1.0f);
+				vect3_normalize(&sun_dir);
+				light_system_set_directional(vect4_create(0.7f, 0.7f, 0.7f, 1.0f), sun_dir);
+				light_system_set_ambient(vect4_create(0.3f, 0.3f, 0.4f, 1.0f));
+				mat4 light_space_mat = renderer_calculate_directional_light_space_matrix(sun_dir, vect3_create(0.0f, 0.0f, 0.0f));
+				if (renderer_begin_render_pass(shadow_pass, shadow_target))
+				{
+					shader* shd = shader_system_get("M_shadow_shader");
+					shader_system_use("M_shadow_shader");
+					shader_system_set_uniform(shd, "u_light_space_matrix", &light_space_mat);
+
+					for (u32 i = 0; i < packet.geometry_count; ++i)
+					{
+						shader_system_set_uniform(shd, "u_model", &packet.geometries[i].model);
+						renderer_draw_geometry(packet.geometries[i]);
+					}
+					renderer_end_render_pass(shadow_pass);
+				}
 
 				if (renderer_begin_render_pass(world_pass, screen_target))
 				{
 					renderer_push_world_matrices();
-					renderer_draw_test_geometry();
+
+					shader* obj_shader = shader_system_get("M_object_shader");
+					shader_system_use("M_object_shader");
+					shader_system_set_uniform(obj_shader, "u_light_space_matrix", &light_space_mat);
+					i32 shadow_unit = 2;
+					shader_system_set_uniform(obj_shader, "u_shadow_sampler", &shadow_unit);
+
+					for (u32 i = 0; i < packet.geometry_count; ++i)
+					{
+						shader_system_set_uniform(obj_shader, "u_push.model", &packet.geometries[i].model);
+						mat4 normal_matrix = packet.geometries[i].model;
+						shader_system_set_uniform(obj_shader, "u_push.normal_matrix", &normal_matrix);
+
+						i32 diff_unit = 0;
+						shader_system_set_uniform(obj_shader, "diffuse_sampler", &diff_unit);
+						i32 spec_unit = 1;
+						shader_system_set_uniform(obj_shader, "specular_sampler", &spec_unit);
+						shader_system_set_uniform(obj_shader, "shininess", &packet.geometries[i].geometry->material->shininess);
+
+						renderer_draw_geometry(packet.geometries[i]);
+					}
+
 					renderer_end_render_pass(world_pass);
 				}
-/*
-				if (renderer_begin_render_pass(ui_pass, screen_target))
-				{
-					renderer_update_global_matrices(ui_projection, ui_view);
-					shader* ui_shader = shader_system_get("M_ui_shader");
-					shader_system_use("M_ui_shader");
-					mat4 ui_model = mat4_id();
-					shader_system_set_uniform(ui_shader, "u_push.model", &ui_model);
-					renderer_draw_geometry(my_ui_image);
-					renderer_end_render_pass(ui_pass);
-				}
-*/
+
+				/*
+					if (renderer_begin_render_pass(ui_pass, screen_target))
+						{
+							renderer_update_global_matrices(ui_projection, ui_view);
+							shader* ui_shader = shader_system_get("M_ui_shader");
+							shader_system_use("M_ui_shader");
+							mat4 ui_model = mat4_id();
+							shader_system_set_uniform(ui_shader, "u_push.model", &ui_model);
+							renderer_draw_geometry(my_ui_image);
+							renderer_end_render_pass(ui_pass);
+						}
+				*/
 				renderer_end_frame(&packet);
 			}
 

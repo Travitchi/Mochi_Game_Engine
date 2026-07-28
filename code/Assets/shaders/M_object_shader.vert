@@ -30,11 +30,14 @@ layout (location = 0) uniform struct PushConstants {
     mat4 normal_matrix;
 } u_push;
 
+uniform mat4 u_light_space_matrix;
+
 layout (location = 0) out vec2 out_texcoord;
 layout (location = 1) out vec3 out_normal;
 layout (location = 2) out vec4 out_ambient;
 layout (location = 3) out vec3 out_view_position;
 layout (location = 4) out vec3 out_frag_position;
+layout (location = 5) out vec4 out_light_space_pos;
 
 void main() {
     vec4 world_position = u_push.model * vec4(in_position, 1.0);
@@ -46,4 +49,5 @@ void main() {
     
     out_view_position = global_ubo.view_position.xyz;
     out_frag_position = world_position.xyz;
+    out_light_space_pos = u_light_space_matrix * world_position;
 }

@@ -2,6 +2,7 @@
 #include "core/logger.h"
 #include <glad.h>
 #include <SDL.h>
+#include <string.h>
 #include "Platform.h"
 #include "render_buffer.h"
 #include "opengl_image.h"
@@ -423,6 +424,17 @@ b8 opengl_backend_begin_render_pass(renderer_backend* backend, struct render_pas
         glClear(clear_bits);
     }
 
+    if (strcmp(pass->name, "Builtin.RenderPass.World") == 0)
+    {
+        texture* shadow_tex = renderer_shadow_map_texture_get();
+        if (shadow_tex && shadow_tex->internal_data)
+        {
+            opengl_image* shadow_img = (opengl_image*)shadow_tex->internal_data;
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, shadow_img->handle);
+        }
+    }
+
     return TRUE;
 }
 
@@ -483,7 +495,7 @@ void opengl_backend_update_global_matrices(struct renderer_backend* backend, mat
         global_uniform_data ubo_data = {};
         ubo_data.projection = projection;
         ubo_data.view = view;
-        ubo_data.ambient_color = vect4_create(0.25f, 0.25f, 0.25f, 1.0f);
+        ubo_data.ambient_color = light_system_get_ambient();
         camera* active_cam = camera_system_get_default();
         vect3 cam_pos = camera_position_get(active_cam);
         ubo_data.view_position = vect4_create(cam_pos.x, cam_pos.y, cam_pos.z, 1.0f);

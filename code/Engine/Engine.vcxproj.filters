@@ -132,6 +132,9 @@
     <ClInclude Include="src\systems\camera_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\systems\sprite_manager_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\logger.cpp">
@@ -225,6 +228,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\systems\camera_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\sprite_manager_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

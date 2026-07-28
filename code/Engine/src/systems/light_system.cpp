@@ -7,6 +7,7 @@ typedef struct light_system_state
     directional_light dir_light;
     point_light p_lights[MAX_POINT_LIGHTS];
     u32 p_light_count;
+    vect4 ambient_color;
 } light_system_state;
 
 static light_system_state* state_ptr = 0;
@@ -15,6 +16,8 @@ b8 light_system_initialize()
 {
     state_ptr = (light_system_state*)Mallocate(sizeof(light_system_state), MEMORY_TAG_RENDERER);
     state_ptr->p_light_count = 0;
+    //ambient
+    state_ptr->ambient_color = vect4_create(0.0f, 0.0f, 0.0f, 1.0f);
     //sunlight
     state_ptr->dir_light.color = vect4_create(0.8f, 0.8f, 0.8f, 1.0f);
     state_ptr->dir_light.direction = vect4_create(0.57735f, -0.57735f, -0.57735f, 0.0f);
@@ -74,4 +77,17 @@ point_light* light_system_get_point_lights()
 u32 light_system_get_point_light_count() 
 {
     return state_ptr ? state_ptr->p_light_count : 0;
+}
+
+void light_system_set_ambient(vect4 color)
+{
+    if (state_ptr)
+    {
+        state_ptr->ambient_color = color;
+    }
+}
+
+vect4 light_system_get_ambient()
+{
+    return state_ptr ? state_ptr->ambient_color : vect4_create(0.0f, 0.0f, 0.0f, 1.0f);
 }

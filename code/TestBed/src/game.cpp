@@ -12,8 +12,8 @@ b8 game_initialize(game* game_inst)
     game_state* state = (game_state*)game_inst->state;
 
     camera* active_cam = camera_system_get_default();
-    camera_position_set(active_cam, vect3{ 0.0f, 34.0f, 45.0f });
-    camera_rotation_set(active_cam, vect3{ -0.45f, 0.0f, 0.0f });
+    camera_position_set(active_cam, vect3{ 0.0f, 0.0f, 0.0f });
+    camera_rotation_set(active_cam, vect3{ 0.00f, 0.0f, 0.0f });
     return TRUE;
 }
 
@@ -38,14 +38,9 @@ b8 game_update(game* game_inst, f32 delta_time)
     if (input_is_key_pressed(SDL_SCANCODE_SPACE)) { camera_move_up(active_cam, move_speed); }
     if (input_is_key_pressed(SDL_SCANCODE_LSHIFT)) { camera_move_down(active_cam, move_speed); }
 
-    if (input_is_key_pressed(SDL_SCANCODE_T))
-    {
-        MDEBUG("Swapping texture!");
-        event_context context = {};
-        event_fire(0x10, game_inst, context);
-    }
-
-   /* if (active_cam->is_dirty)
+    
+    
+    if (active_cam->is_dirty)
     {
         vect3 pos = camera_position_get(active_cam);
         vect3 rot = camera_rotation_get(active_cam);
@@ -53,7 +48,7 @@ b8 game_update(game* game_inst, f32 delta_time)
         MINFO("Cam Pos [ X: %.2f | Y: %.2f | Z: %.2f ] || Rot [ P: %.2f | Y: %.2f ]",
             pos.x, pos.y, pos.z, rot.x, rot.y);
     }
-    */
+    
     return TRUE;
 }
 

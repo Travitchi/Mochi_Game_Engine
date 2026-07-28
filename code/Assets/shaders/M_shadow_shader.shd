@@ -1,0 +1,7 @@
+# Shadow Mapping Built-in Shader Config
+# 2 = SHADER_ATTRIB_TYPE_FLOAT32_3
+attribute=a_position,2
+
+# 10 = SHADER_UNIFORM_TYPE_MATRIX_4
+uniform=u_light_space_matrix,10
+uniform=u_model,10

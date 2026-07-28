@@ -8,6 +8,7 @@
 #include "event.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "texture_systems.h"
 #include "material_systems.h"
 #include "geometry_systems.h"
@@ -16,7 +17,6 @@
 #include "M_transform.h"
 
 static renderer_backend* backend = 0;
-static geometry* test_geometry = 0;
 static mat4 world_projection = mat4_id();
 static mat4 world_view = mat4_id();
 static render_target window_target = {};
@@ -25,32 +25,9 @@ static u32 registered_pass_count = 0;
 static render_target world_offscreen_target = {};
 static texture offscreen_color_tex = {};
 static texture offscreen_depth_tex = {};
+static render_target shadow_target = {};
+static texture shadow_depth_tex = {};
 
-
-b8 event_on_debug_event(u16 code, void* sender, void* listener_inst, event_context context)
-{
-
-    static f64 last_swap_time = 0;
-    f64 current_time = platform_get_absolute_time();
-
-    if (current_time - last_swap_time < 0.2)
-    {
-        return TRUE;
-    }
-    last_swap_time = current_time;
-    const char* names[2] = { "test_mat_1", "test_mat_2" };
-    static i32 choice = 1;
-
-    if (test_geometry)
-    {
-        test_geometry->material = material_system_acquire(names[choice]);
-    }
-
-    choice++;
-    choice %= 2;
-
-    return TRUE;
-}
 
 static b8 create_render_pass(const render_pass_config* config, render_pass* out_pass)
 {
@@ -127,6 +104,26 @@ b8 renderer_initialize(const char* application_name, struct platform_state* plat
     world_config.blend_enabled = FALSE;
     create_render_pass(&world_config, &registered_passes[0]);
 
+    //Configure Shadow Pass
+    render_pass_config shadow_config = {};
+    strcpy_s(shadow_config.name, 256, "Builtin.RenderPass.Shadow");
+    shadow_config.render_area_x = 0;
+    shadow_config.render_area_y = 0;
+    shadow_config.render_area_w = 2048; // High resolution for crisp shadows
+    shadow_config.render_area_h = 2048;
+    shadow_config.clear_color = vect4_create(0.0f, 0.0f, 0.0f, 0.0f);
+    shadow_config.clear_flags = RENDER_PASS_CLEAR_DEPTH_BUFFER_FLAG; // Depth ONLY!
+    shadow_config.depth_test_enabled = TRUE;
+    shadow_config.blend_enabled = FALSE;
+    create_render_pass(&shadow_config, &registered_passes[2]);
+    renderer_create_texture("shadow_map_texture", FALSE, 2048, 2048, 1, nullptr, FALSE, &shadow_depth_tex);
+    texture* shadow_attachments[1] = { &shadow_depth_tex };
+    if (backend && backend->render_target_create)
+    {
+        backend->render_target_create(backend, 1, shadow_attachments, &shadow_target);
+    }
+
+
     //Configure the UI Render Pass
     render_pass_config ui_config = {};
     strcpy_s(ui_config.name, 256, "Builtin.RenderPass.UI");
@@ -150,7 +147,6 @@ b8 renderer_initialize(const char* application_name, struct platform_state* plat
         backend->render_target_create(backend, 2, attachments, &world_offscreen_target);
     }
 
-    event_register(0x10, 0, event_on_debug_event);
     renderer_on_resize(1280, 720);
     return TRUE;
 }
@@ -175,8 +171,11 @@ void renderer_on_resize(u16 width, u16 height)
 
     for (u32 i = 0; i < registered_pass_count; ++i)
     {
+        if (strcmp(registered_passes[i].name, "Builtin.RenderPass.Shadow") != 0)
+        {
         registered_passes[i].render_area_w = (f32)width;
         registered_passes[i].render_area_h = (f32)height;
+        }
     }
 
     if (backend) 
@@ -278,42 +277,6 @@ void renderer_draw_geometry(geometry_render_data data)
     }
 }
 
-void renderer_draw_test_geometry()
-{
-    if (backend && backend->update_object)
-    {
-        if (!test_geometry)
-        {
-            geometry_config cube_config = geometry_system_generate_cube_config(10.0f, 10.0f, 10.0f, 1.0f, 1.0f, "test_cube", "test_mat_1");
-            test_geometry = geometry_system_acquire_from_config(cube_config, TRUE);
-            Mfree(cube_config.vertices, cube_config.vertex_size * cube_config.vertex_count, MEMORY_TAG_ARRAY);
-            Mfree(cube_config.indices, cube_config.index_size * cube_config.index_count, MEMORY_TAG_ARRAY);
-        }
-
-        geometry_render_data data = {};
-        data.geometry = test_geometry;
-        static transform test_transform = transform_from_position(vect3_create(0.0f, 0.0f, -20.0f));
-       // static f32 angle = 0.0f;
-        //angle += 0.0005f;
-        //transform_rotation_set(&test_transform, vect3_create(angle * 0.5f, angle, 0.0f));
-        data.model = transform_get_world(&test_transform);
-        
-        shader* obj_shader = shader_system_get("M_object_shader");
-        shader_system_use("M_object_shader");
-        shader_system_set_uniform(obj_shader, "u_push.model", &data.model);
-        mat4 normal_matrix = data.model;
-        shader_system_set_uniform(obj_shader, "u_push.normal_matrix", &normal_matrix);
-        i32 texture_unit = 0;
-        shader_system_set_uniform(obj_shader, "diffuse_sampler", &texture_unit);
-
-
-        i32 spec_texture_unit = 1;
-        shader_system_set_uniform(obj_shader, "specular_sampler", &spec_texture_unit);
-        shader_system_set_uniform(obj_shader, "shininess", &data.geometry->material->shininess);
-
-        backend->update_object(backend, data);
-    }
-}
 
 b8 renderer_shader_create(struct shader* shader, const struct shader_config* config)
 {
@@ -355,4 +318,79 @@ void renderer_push_world_matrices()
         mat4 view = camera_view_get(active_camera);
         backend->update_global_matrices(backend, world_projection, view);
     }
+}
+
+static MINLINE f32 vect3_distance_squared(vect3 a, vect3 b)
+{
+    f32 dx = b.x - a.x;
+    f32 dy = b.y - a.y;
+    f32 dz = b.z - a.z;
+    return (dx * dx) + (dy * dy) + (dz * dz);
+}
+
+static int compare_distance_back_to_front(const void* a, const void* b)
+{
+    const geometry_render_data* geom_a = (const geometry_render_data*)a;
+    const geometry_render_data* geom_b = (const geometry_render_data*)b;
+    vect3 pos_a = vect3_create(geom_a->model.data[12], geom_a->model.data[13], geom_a->model.data[14]);
+    vect3 pos_b = vect3_create(geom_b->model.data[12], geom_b->model.data[13], geom_b->model.data[14]);
+    camera* active_cam = camera_system_get_default();
+    vect3 cam_pos = camera_position_get(active_cam);
+    f32 dist_a = vect3_distance_squared(pos_a, cam_pos);
+    f32 dist_b = vect3_distance_squared(pos_b, cam_pos);
+
+    if (dist_a < dist_b) return 1;
+    if (dist_a > dist_b) return -1;
+    return 0;
+}
+
+static int compare_y_sort(const void* a, const void* b)
+{
+    const geometry_render_data* geom_a = (const geometry_render_data*)a;
+    const geometry_render_data* geom_b = (const geometry_render_data*)b;
+    f32 y_a = geom_a->model.data[13];
+    f32 y_b = geom_b->model.data[13];
+
+    if (y_a < y_b) return 1;
+    if (y_a > y_b) return -1;
+    return 0;
+}
+
+void renderer_sort_geometries(geometry_render_data* geometries, u32 count, b8 sort_by_camera_distance)
+{
+    if (!geometries || count <= 1) return;
+
+    if (sort_by_camera_distance)
+    {
+        qsort(geometries, count, sizeof(geometry_render_data), compare_distance_back_to_front);
+    }
+    else
+    {
+        qsort(geometries, count, sizeof(geometry_render_data), compare_y_sort);
+    }
+}
+
+struct render_target* renderer_shadow_target_get()
+{
+    return &shadow_target;
+}
+
+texture* renderer_shadow_map_texture_get()
+{
+    return &shadow_depth_tex;
+}
+
+mat4 renderer_calculate_directional_light_space_matrix(vect3 light_dir, vect3 target_center)
+{
+    //orthographic projection box for the sun (Left, Right, Bottom, Top, Near, Far)
+    mat4 light_projection = mat4_orthographic(-30.0f, 30.0f, -30.0f, 30.0f, -100.0f, 100.0f);
+
+    //Position the light camera backward
+    vect3 light_pos = vect3_sub(target_center, vect3_mult_scale(light_dir, 30.0f));
+
+    //Look at the center of the scene
+    mat4 light_view = mat4_look_at(light_pos, target_center, vect3_create(0.0f, -1.0f, 0.0f));
+
+    // Combine into a single matrix that transforms World Space -> Light Space
+    return mat4_mult(light_view, light_projection);
 }

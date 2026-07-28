@@ -27,3 +27,5 @@ void light_system_remove_all_point_lights();
 directional_light* light_system_get_directional();
 point_light* light_system_get_point_lights();
 u32 light_system_get_point_light_count();
+void light_system_set_ambient(vect4 color);
+vect4 light_system_get_ambient();
