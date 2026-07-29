@@ -1,0 +1,9 @@
+uniform=u_push.model,10
+uniform=u_push.normal_matrix,10
+uniform=diffuse_sampler,11
+uniform=normal_sampler,11
+uniform=shininess,0
+uniform=u_light_space_matrix,10
+uniform=u_shadow_sampler,11
+uniform=u_uv_offset,1
+uniform=u_uv_scale,1

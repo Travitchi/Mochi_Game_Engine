@@ -2,7 +2,8 @@
 #include "defines.hpp"
 #include "resource_types.h"
 
-typedef struct texture_system_config {
+typedef struct texture_system_config
+{
     u32 max_texture_count;
 } texture_system_config;
 
@@ -13,3 +14,5 @@ texture* texture_system_acquire(const char* name, b8 auto_release);
 void texture_system_release(const char* name);
 texture* texture_system_get_default_texture();
 texture* texture_system_get_default_specular_texture();
+
+KAPI texture* texture_system_acquire_sprite(const char* name, b8 auto_release);

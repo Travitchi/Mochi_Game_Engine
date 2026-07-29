@@ -4,17 +4,18 @@
 #include "texture_systems.h"
 #include <string.h>
 
-typedef struct sprite_system_state {
-    sprite_system_config config;
+typedef struct sprite_manager_system_state 
+{
+    sprite_manager_system_config config;
     sprite_sheet* registered_sheets;
     sprite* registered_sprites;
     u32 sheet_count;
     u32 sprite_count;
-} sprite_system_state;
+} sprite_manager_system_state;
 
-static sprite_system_state* state_ptr = 0;
+static sprite_manager_system_state* state_ptr = 0;
 
-b8 sprite_system_initialize(u64* memory_requirement, void* state, sprite_system_config config)
+b8 sprite_system_initialize(u64* memory_requirement, void* state, sprite_manager_system_config config)
 {
     if (config.max_sprite_sheet_count == 0 || config.max_sprite_count == 0)
     {
@@ -22,25 +23,21 @@ b8 sprite_system_initialize(u64* memory_requirement, void* state, sprite_system_
         return FALSE;
     }
 
-    u64 struct_requirement = sizeof(sprite_system_state);
+    u64 struct_requirement = sizeof(sprite_manager_system_state);
     u64 sheets_requirement = sizeof(sprite_sheet) * config.max_sprite_sheet_count;
     u64 sprites_requirement = sizeof(sprite) * config.max_sprite_count;
     *memory_requirement = struct_requirement + sheets_requirement + sprites_requirement;
-
     if (!state) return TRUE;
-
-    state_ptr = (sprite_system_state*)state;
+    state_ptr = (sprite_manager_system_state*)state;
     state_ptr->config = config;
     state_ptr->sheet_count = 0;
     state_ptr->sprite_count = 0;
 
     void* sheets_block = (u8*)state + struct_requirement;
     state_ptr->registered_sheets = (sprite_sheet*)sheets_block;
-
     void* sprites_block = (u8*)sheets_block + sheets_requirement;
     state_ptr->registered_sprites = (sprite*)sprites_block;
 
-    // Zero out registered memory pools
     Mzero_memory(state_ptr->registered_sheets, sheets_requirement);
     Mzero_memory(state_ptr->registered_sprites, sprites_requirement);
 
@@ -80,19 +77,18 @@ sprite_sheet* sprite_system_create_sheet(const char* name, const char* diffuse_t
     strcpy_s(sheet->name, 256, name);
 
     // Acquire Diffuse Texture
-    sheet->diffuse_texture = texture_system_acquire(diffuse_texture_name, TRUE);
-    if (!sheet->diffuse_texture)
+    sheet->diffuse_texture = texture_system_acquire_sprite(diffuse_texture_name, TRUE);
+    if (!sheet->diffuse_texture) 
     {
         MWARN("Failed to acquire diffuse texture '%s' for sheet '%s'. Using default.", diffuse_texture_name, name);
         sheet->diffuse_texture = texture_system_get_default_texture();
     }
-
-    // Acquire Normal Map Texture (Fallback to engine default if none specified)
-    if (normal_texture_name && strlen(normal_texture_name) > 0)
+    
+    if (normal_texture_name && strlen(normal_texture_name) > 0) 
     {
-        sheet->normal_texture = texture_system_acquire(normal_texture_name, TRUE);
-    }
-    else
+        sheet->normal_texture = texture_system_acquire_sprite(normal_texture_name, TRUE);
+    } 
+    else 
     {
         sheet->normal_texture = texture_system_get_default_texture();
     }
@@ -102,7 +98,6 @@ sprite_sheet* sprite_system_create_sheet(const char* name, const char* diffuse_t
     sheet->tile_width = tile_width;
     sheet->tile_height = tile_height;
 
-    // Calculate grid dimensions
     sheet->columns = sheet->width / tile_width;
     sheet->rows = sheet->height / tile_height;
 
@@ -184,10 +179,8 @@ sprite* sprite_system_get_sprite(const char* name)
 void sprite_set_frame(sprite* s, u32 frame_index)
 {
     if (!s || !s->sheet) return;
-
     u32 total_frames = s->sheet->columns * s->sheet->rows;
     if (total_frames == 0) return;
-
     // Safely wrap out-of-bounds frame indices
     if (frame_index >= total_frames)
     {
@@ -195,17 +188,13 @@ void sprite_set_frame(sprite* s, u32 frame_index)
     }
 
     s->current_frame = frame_index;
-
     // Calculate 2D grid coordinates
     u32 col = frame_index % s->sheet->columns;
     u32 row = frame_index / s->sheet->columns;
-
     // Calculate normalized UV scale (size of one tile in 0.0 to 1.0 space)
     s->uv_scale = vect2_create(1.0f / (f32)s->sheet->columns, 1.0f / (f32)s->sheet->rows);
-
     // Calculate normalized UV offset (starting position of the tile)
     s->uv_offset = vect2_create((f32)col * s->uv_scale.x, (f32)row * s->uv_scale.y);
-
     // Calculate exact bounding box coordinates
     s->uv_min = s->uv_offset;
     s->uv_max = vect2_create(s->uv_min.x + s->uv_scale.x, s->uv_min.y + s->uv_scale.y);

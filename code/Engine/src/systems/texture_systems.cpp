@@ -117,3 +117,35 @@ texture* texture_system_get_default_specular_texture()
 {
     return &state_ptr->default_specular_texture;
 }
+
+b8 load_sprite_texture(const char* sprite_name, texture* out_texture)
+{
+    resource img_resource;
+    if (!resource_system_load(sprite_name, RESOURCE_TYPE_SPRITE, &img_resource))
+    {
+        return FALSE;
+    }
+
+    image_resource_data* resource_data = (image_resource_data*)img_resource.data;
+    texture temp_texture = {};
+    renderer_create_texture(sprite_name, TRUE, resource_data->width, resource_data->height, resource_data->channel_count, resource_data->pixels, FALSE, &temp_texture);
+    texture old = *out_texture;
+    *out_texture = temp_texture;
+    renderer_destroy_texture(&old);
+    out_texture->generation = old.generation + 1;
+    resource_system_unload(&img_resource);
+
+    return TRUE;
+}
+
+texture* texture_system_acquire_sprite(const char* name, b8 auto_release)
+{
+    static u32 sprite_tex_count = 0;
+    texture* new_texture = &state_ptr->registered_textures[sprite_tex_count];
+    if (load_sprite_texture(name, new_texture))
+    {
+        sprite_tex_count++;
+        return new_texture;
+    }
+    return &state_ptr->default_texture;
+}

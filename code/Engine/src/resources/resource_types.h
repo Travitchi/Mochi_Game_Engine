@@ -73,7 +73,8 @@ typedef enum resource_type
     RESOURCE_TYPE_IMAGE,
     RESOURCE_TYPE_MATERIAL,
     RESOURCE_TYPE_SHADER,
-    RESOURCE_TYPE_CUSTOM
+    RESOURCE_TYPE_CUSTOM,
+    RESOURCE_TYPE_SPRITE
 } resource_type;
 
 typedef struct resource 

@@ -14,11 +14,13 @@
 #include "resource_systems.h"
 #include "camera_system.h"
 #include "light_system.h"
+#include "sprite_manager_system.h"
 #include "image_loader.h"
 #include "text_loader.h"
 #include "material_loader.h"
 #include "shader_system.h"
 #include "shader_loader.h"
+#include "sprite_loader.h"
 #include <string.h>
 #include "M_transform.h"
 
@@ -41,6 +43,7 @@ typedef struct application_state
 	u64 geometry_system_memory_requirement;
 	void* geometry_system_state_memory;
 	void* shader_system_state_memory;
+	void* sprite_system_state_memory;
 };
 
 static b8 initialized = FALSE;  //safety check
@@ -118,6 +121,7 @@ KAPI b8 application_create(game* game_inst)
 	resource_system_register_loader(text_resource_loader_create());
 	resource_system_register_loader(material_resource_loader_create());
 	resource_system_register_loader(shader_resource_loader_create());
+	resource_system_register_loader(sprite_resource_loader_create());
 
 	//renderer startup
 	if (!renderer_initialize(game_inst->app_config.name, &app_state.platform)) 
@@ -188,6 +192,23 @@ KAPI b8 application_create(game* game_inst)
 		resource_system_unload(&shadow_shader_res);
 	}
 
+	resource sprite_shader_config_resource;
+	if (!resource_system_load("M_sprite", RESOURCE_TYPE_SHADER, &sprite_shader_config_resource))
+	{
+		MFATAL("Failed to load M_sprite shader resource!");
+		return FALSE;
+	}
+
+	shader sprite_shd;
+	if (!shader_system_create_shader((const struct shader_config*)sprite_shader_config_resource.data, &sprite_shd))
+	{
+		MFATAL("Failed to create M_sprite shader!");
+		resource_system_unload(&sprite_shader_config_resource);
+		return FALSE;
+	}
+	resource_system_unload(&sprite_shader_config_resource);
+
+
 	//material system startup
 	material_system_config mat_config;
 	mat_config.max_material_count = 4096;
@@ -202,6 +223,21 @@ KAPI b8 application_create(game* game_inst)
 	geometry_system_initialize(&geo_sys_mem_req, 0, geo_config);
 	void* geo_sys_state = Mallocate(geo_sys_mem_req, MEMORY_TAG_APPLICATION);
 	geometry_system_initialize(&geo_sys_mem_req, geo_sys_state, geo_config);
+
+	//sprite system startup
+	sprite_manager_system_config sprite_sys_config = {};
+	sprite_sys_config.max_sprite_sheet_count = 10;  // Capacity for 10 atlases
+	sprite_sys_config.max_sprite_count = 100;       // Capacity for 100 sprite instances on screen
+
+	u64 sprite_sys_memory_requirement = 0;
+	sprite_system_initialize(&sprite_sys_memory_requirement, 0, sprite_sys_config);
+	app_state.sprite_system_state_memory = Mallocate(sprite_sys_memory_requirement, MEMORY_TAG_APPLICATION);
+
+	if (!sprite_system_initialize(&sprite_sys_memory_requirement, app_state.sprite_system_state_memory, sprite_sys_config))
+	{
+		MFATAL("Failed to initialize sprite system.");
+		return FALSE;
+	}
 
 	//set initial window size
 	app_state.width = game_inst->app_config.start_width;
@@ -228,6 +264,7 @@ KAPI b8 application_create(game* game_inst)
 	scene_floor = geometry_system_acquire_from_config(floor_config, TRUE);
 	Mfree(floor_config.vertices, floor_config.vertex_size * floor_config.vertex_count, MEMORY_TAG_ARRAY);
 	Mfree(floor_config.indices, floor_config.index_size * floor_config.index_count, MEMORY_TAG_ARRAY);
+	
 
 	initialized = TRUE;
 	return TRUE;
@@ -284,6 +321,29 @@ KAPI b8 application_run()
 	geometry_render_data world_geometries[2] = {};
 	world_geometries[0].geometry = floor_geom;
 	world_geometries[1].geometry = cube_geom;
+
+	//sprite
+	sprite_sheet* axul_sheet = sprite_system_create_sheet("axul_sheet", "axul_chars", "", 16, 24);
+	// 2. Create the character instance and set to Frame 52 (Middle Hero, Idle South)
+	sprite* hero_sprite = sprite_system_create_sprite("hero", axul_sheet);
+	sprite_set_frame(hero_sprite, 52);
+
+	// 3. Generate a 2:3 aspect ratio plane quad (width 1.0, height 1.5 matches 16x24 proportions)
+	geometry_config sprite_quad_config = geometry_system_generate_plane_config(
+		1.0f, 1.5f,
+		1, 1,
+		1.0f, 1.0f,
+		"hero_quad_geom",
+		"sprite_mat"
+	);
+	geometry* hero_geom = geometry_system_acquire_from_config(sprite_quad_config, TRUE);
+
+	// 4. Override the material's diffuse texture pointer to use our loaded sprite sheet!
+	hero_geom->material->diffuse_map.texture = axul_sheet->diffuse_texture;
+
+	// 5. Place the sprite at Z = 2.0f (closer to camera than the cube), with Y = 0.75f so feet touch the ground
+	transform hero_transform = transform_from_position(vect3_create(0.0f, 0.5f, 6.0f));
+
 	while (app_state.is_run)
 	{
 		
@@ -385,6 +445,23 @@ KAPI b8 application_run()
 
 						renderer_draw_geometry(packet.geometries[i]);
 					}
+					shader_system_use("M_sprite");
+					shader* sprite_shader = shader_system_get("M_sprite");
+
+					i32 sprite_diffuse_unit = 0;
+					shader_system_set_uniform(sprite_shader, "diffuse_sampler", &sprite_diffuse_unit);
+					shader_system_set_uniform(sprite_shader, "u_uv_offset", &hero_sprite->uv_offset);
+					shader_system_set_uniform(sprite_shader, "u_uv_scale", &hero_sprite->uv_scale);
+
+					f32 sprite_shininess = 8.0f;
+					shader_system_set_uniform(sprite_shader, "shininess", &sprite_shininess);
+
+					geometry_render_data hero_render_data = {};
+					hero_render_data.geometry = hero_geom;
+					hero_render_data.model = transform_get_world(&hero_transform);
+					hero_render_data.object_id = 3;
+
+					renderer_draw_geometry(hero_render_data);
 
 					renderer_end_render_pass(world_pass);
 				}
@@ -437,6 +514,7 @@ KAPI b8 application_run()
 	input_shutdown();
 	renderer_shutdown();
 	light_system_shutdown();
+	sprite_system_shutdown(app_state.sprite_system_state_memory);
 	geometry_system_shutdown(app_state.geometry_system_state_memory);
 	material_system_shutdown(app_state.material_system_state_memory);
 	texture_system_shutdown(app_state.texture_system_state_memory);

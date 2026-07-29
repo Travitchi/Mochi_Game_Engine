@@ -29,13 +29,13 @@ typedef struct sprite
     vect2 uv_scale;                 // Direct uniform input for GLSL: Tile scale
 } sprite;
 
-typedef struct sprite_system_config 
+typedef struct sprite_manager_system_config 
 {
     u32 max_sprite_sheet_count;
     u32 max_sprite_count;
-} sprite_system_config;
+} sprite_manager_system_config;
 
-KAPI b8 sprite_system_initialize(u64* memory_requirement, void* state, sprite_system_config config);
+KAPI b8 sprite_system_initialize(u64* memory_requirement, void* state, sprite_manager_system_config config);
 KAPI void sprite_system_shutdown(void* state);
 
 // Sprite Sheet Management
