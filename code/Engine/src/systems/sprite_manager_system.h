@@ -50,3 +50,4 @@ KAPI sprite* sprite_system_get_sprite(const char* name);
 
 // Frame Slicing Math
 KAPI void sprite_set_frame(sprite* s, u32 frame_index);
+KAPI void sprite_set_frame_by_coord(sprite* s, u32 row, u32 col);

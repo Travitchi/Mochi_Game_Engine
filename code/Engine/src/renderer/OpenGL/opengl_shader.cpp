@@ -92,6 +92,9 @@ b8 opengl_shader_set_uniform(opengl_shader* shader, u16 index, void* value)
     case SHADER_UNIFORM_TYPE_FLOAT32:
         glUniform1f(loc, *(f32*)value);
         break;
+    case SHADER_UNIFORM_TYPE_VECTOR_2:
+        glUniform2fv(loc, 1, (f32*)value); 
+        break;
     default:
         MWARN("opengl_shader_set_uniform: Unsupported uniform type %d", type);
         return FALSE;

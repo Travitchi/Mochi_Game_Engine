@@ -27,12 +27,11 @@ layout (std140, binding = 0) uniform GlobalUniforms {
 
 layout (location = 0) uniform struct PushConstants {
     mat4 model;
-    mat4 normal_matrix;
 } u_push;
 
 uniform mat4 u_light_space_matrix;
-uniform vec2 u_uv_offset; // From sprite_manager_system
-uniform vec2 u_uv_scale;  // From sprite_manager_system
+uniform vec2 u_uv_offset;
+uniform vec2 u_uv_scale;
 
 layout (location = 0) out vec2 out_texcoord;
 layout (location = 1) out vec3 out_normal;
@@ -44,24 +43,21 @@ layout (location = 6) out vec3 out_frag_position;
 layout (location = 7) out vec4 out_light_space_pos;
 
 void main() {
-    // 1. Slice the texture atlas!
+    //Slice the texture atlas!
     out_texcoord = (in_texcoord * u_uv_scale) + u_uv_offset;
 
-    // 2. Extract world position center and scale from the Model matrix
+    //Extract world position center and scale from the Model matrix
     vec3 world_center = u_push.model[3].xyz;
     vec2 quad_scale = vec2(length(u_push.model[0].xyz), length(u_push.model[1].xyz));
 
-    // 3. CYLINDRICAL BILLBOARDING (Octopath Y-Axis Lock)
+    //CYLINDRICAL BILLBOARDING
     // Extract camera Right axis from View matrix (Row 0) and lock Y to 0.0
     vec3 cam_right = normalize(vec3(global_ubo.view[0][0], 0.0, global_ubo.view[2][0]));
     vec3 cam_up = vec3(0.0, 1.0, 0.0);
     vec3 cam_forward = normalize(cross(cam_up, cam_right)); // Tangent space normal facing camera
 
     // Calculate final world position of the upright quad vertex
-    vec3 world_position = world_center 
-                        + (cam_right * in_position.x * quad_scale.x) 
-                        + (cam_up * in_position.y * quad_scale.y);
-
+    vec3 world_position = world_center + (cam_right * in_position.x * quad_scale.x) + (cam_up * in_position.y * quad_scale.y);
     gl_Position = global_ubo.projection * global_ubo.view * vec4(world_position, 1.0);
     
     // 4. Pass Tangent-Space vectors to Fragment Shader for Normal Mapping

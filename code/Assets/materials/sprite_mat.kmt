@@ -1,0 +1,4 @@
+type=object
+diffuse_color=1.0 1.0 1.0 1.0
+diffuse_map_name=default
+specular_map_name=default_specular

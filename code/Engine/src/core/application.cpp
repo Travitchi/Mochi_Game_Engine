@@ -226,8 +226,8 @@ KAPI b8 application_create(game* game_inst)
 
 	//sprite system startup
 	sprite_manager_system_config sprite_sys_config = {};
-	sprite_sys_config.max_sprite_sheet_count = 10;  // Capacity for 10 atlases
-	sprite_sys_config.max_sprite_count = 100;       // Capacity for 100 sprite instances on screen
+	sprite_sys_config.max_sprite_sheet_count = 10;
+	sprite_sys_config.max_sprite_count = 100;
 
 	u64 sprite_sys_memory_requirement = 0;
 	sprite_system_initialize(&sprite_sys_memory_requirement, 0, sprite_sys_config);
@@ -265,7 +265,6 @@ KAPI b8 application_create(game* game_inst)
 	Mfree(floor_config.vertices, floor_config.vertex_size * floor_config.vertex_count, MEMORY_TAG_ARRAY);
 	Mfree(floor_config.indices, floor_config.index_size * floor_config.index_count, MEMORY_TAG_ARRAY);
 	
-
 	initialized = TRUE;
 	return TRUE;
 }
@@ -326,7 +325,7 @@ KAPI b8 application_run()
 	sprite_sheet* axul_sheet = sprite_system_create_sheet("axul_sheet", "axul_chars", "", 16, 24);
 	// 2. Create the character instance and set to Frame 52 (Middle Hero, Idle South)
 	sprite* hero_sprite = sprite_system_create_sprite("hero", axul_sheet);
-	sprite_set_frame(hero_sprite, 52);
+	sprite_set_frame_by_coord(hero_sprite, 5, 4);
 
 	// 3. Generate a 2:3 aspect ratio plane quad (width 1.0, height 1.5 matches 16x24 proportions)
 	geometry_config sprite_quad_config = geometry_system_generate_plane_config(
@@ -342,7 +341,7 @@ KAPI b8 application_run()
 	hero_geom->material->diffuse_map.texture = axul_sheet->diffuse_texture;
 
 	// 5. Place the sprite at Z = 2.0f (closer to camera than the cube), with Y = 0.75f so feet touch the ground
-	transform hero_transform = transform_from_position(vect3_create(0.0f, 0.5f, 6.0f));
+	transform hero_transform = transform_from_position(vect3_create(0.0f, 0.75f, 6.0f));
 
 	while (app_state.is_run)
 	{
@@ -377,15 +376,15 @@ KAPI b8 application_run()
 			packet.delta_time = delta;
 			transform floor_transform = transform_from_position(vect3_create(0.0f, 0.0f, 0.0f));
 			transform_rotation_set(&floor_transform, vect3_create(deg_to_rad(-90.0f), 0.0f, 0.0f));
-			world_geometries[0].geometry = scene_floor; // <-- Explicitly re-assigned!
+			world_geometries[0].geometry = scene_floor;
 			world_geometries[0].model = transform_get_world(&floor_transform);
 
-			// 2. Cube: Placed at Y = 1.0f (exactly 2 units above floor), spinning horizontally
+			//Cube
 			static f32 cube_angle = 0.0f;
 			cube_angle += 1.0f * (f32)delta;
 			transform cube_transform = transform_from_position(vect3_create(0.0f, 3.0f, 0.0f));
-			transform_rotation_set(&cube_transform, vect3_create(0.0f, cube_angle, 0.0f)); // Spin on Y-axis only
-			world_geometries[1].geometry = scene_cube; // <-- Explicitly re-assigned!
+			transform_rotation_set(&cube_transform, vect3_create(0.0f, cube_angle, 0.0f));
+			world_geometries[1].geometry = scene_cube;
 			world_geometries[1].model = transform_get_world(&cube_transform);
 
 			packet.geometry_count = 2;
@@ -404,8 +403,8 @@ KAPI b8 application_run()
 
 				vect3 sun_dir = vect3_create(-0.8f, -10.0f, -1.0f);
 				vect3_normalize(&sun_dir);
-				light_system_set_directional(vect4_create(0.7f, 0.7f, 0.7f, 1.0f), sun_dir);
-				light_system_set_ambient(vect4_create(0.3f, 0.3f, 0.4f, 1.0f));
+				light_system_set_directional(vect4_create(0.5f, 0.5f, 0.5f, 1.0f), sun_dir);
+				light_system_set_ambient(vect4_create(0.15f, 0.15f, 0.15f, 1.0f));
 				mat4 light_space_mat = renderer_calculate_directional_light_space_matrix(sun_dir, vect3_create(0.0f, 0.0f, 0.0f));
 				if (renderer_begin_render_pass(shadow_pass, shadow_target))
 				{
@@ -460,7 +459,7 @@ KAPI b8 application_run()
 					hero_render_data.geometry = hero_geom;
 					hero_render_data.model = transform_get_world(&hero_transform);
 					hero_render_data.object_id = 3;
-
+					shader_system_set_uniform(sprite_shader, "u_push.model", &hero_render_data.model);
 					renderer_draw_geometry(hero_render_data);
 
 					renderer_end_render_pass(world_pass);

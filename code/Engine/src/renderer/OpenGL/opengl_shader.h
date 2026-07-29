@@ -31,6 +31,7 @@ typedef enum shader_uniform_type {
     SHADER_UNIFORM_TYPE_UINT32 = 9,
     SHADER_UNIFORM_TYPE_MATRIX_4 = 10,
     SHADER_UNIFORM_TYPE_SAMPLER = 11,
+    SHADER_UNIFORM_TYPE_VECTOR_2 = 12,
     SHADER_UNIFORM_TYPE_CUSTOM = 255
 } shader_uniform_type;
 

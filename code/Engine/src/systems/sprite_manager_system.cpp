@@ -199,3 +199,15 @@ void sprite_set_frame(sprite* s, u32 frame_index)
     s->uv_min = s->uv_offset;
     s->uv_max = vect2_create(s->uv_min.x + s->uv_scale.x, s->uv_min.y + s->uv_scale.y);
 }
+
+void sprite_set_frame_by_coord(sprite* s, u32 row, u32 col)
+{
+    if (!s || !s->sheet) return;
+    // Safety clamp: Ensure we don't request a column or row that doesn't exist
+    //if (col >= s->sheet->columns) col = s->sheet->columns - 1;
+   // if (row >= s->sheet->rows) row = s->sheet->rows - 1;
+    // Convert the 2D coordinates into your engine's 1D frame index
+    u32 calculated_frame_index = (row * s->sheet->columns) + col;
+    // Call your existing function to do the actual UV math
+    sprite_set_frame(s, calculated_frame_index);
+}
