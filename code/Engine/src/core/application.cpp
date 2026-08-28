@@ -323,11 +323,11 @@ KAPI b8 application_run()
 	*/
 	//sprite
 	sprite_sheet* axul_sheet = sprite_system_create_sheet("axul_sheet", "axul_chars", "", 16, 24);
-	// 2. Create the character instance and set to Frame 52 (Middle Hero, Idle South)
+	//Create the character instance and set to Frame 52 (Middle Hero, Idle South)
 	sprite* hero_sprite = sprite_system_create_sprite("hero", axul_sheet);
-	sprite_set_frame(hero_sprite, 7, 4);
+	sprite_set_frame(hero_sprite, 6, 4);
 
-	// 3. Generate a 2:3 aspect ratio plane quad (width 1.0, height 1.5 matches 16x24 proportions)
+	//Generate a 2:3 aspect ratio plane quad (width 1.0, height 1.5 matches 16x24 proportions)
 	geometry_config sprite_quad_config = geometry_system_generate_plane_config(
 		1.0f, 1.5f,
 		1, 1,

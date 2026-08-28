@@ -1,8 +1,11 @@
 # Object Shader Configuration
+attribute=in_position,0
+attribute=in_texcoord,1
+attribute=in_normal,2
 uniform=u_push.model,10
 uniform=u_push.normal_matrix,10
+uniform=u_light_space_matrix,10
 uniform=diffuse_sampler,11
 uniform=specular_sampler,11
-uniform=shininess,0
-uniform=u_light_space_matrix,10
 uniform=u_shadow_sampler,11
+uniform=shininess,0
