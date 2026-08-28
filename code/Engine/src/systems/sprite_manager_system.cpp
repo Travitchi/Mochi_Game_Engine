@@ -150,7 +150,7 @@ sprite* sprite_system_create_sprite(const char* name, sprite_sheet* sheet)
     s->sheet = sheet;
 
     // Initialize to frame 0
-    sprite_set_frame(s, 0);
+    sprite_set_frame(s, 0, 0);
     return s;
 }
 
@@ -176,38 +176,20 @@ sprite* sprite_system_get_sprite(const char* name)
     return 0;
 }
 
-void sprite_set_frame(sprite* s, u32 frame_index)
+void sprite_set_frame(sprite* s, u32 row, u32 col)
 {
     if (!s || !s->sheet) return;
-    u32 total_frames = s->sheet->columns * s->sheet->rows;
-    if (total_frames == 0) return;
-    // Safely wrap out-of-bounds frame indices
-    if (frame_index >= total_frames)
-    {
-        frame_index = frame_index % total_frames;
-    }
-
-    s->current_frame = frame_index;
-    // Calculate 2D grid coordinates
-    u32 col = frame_index % s->sheet->columns;
-    u32 row = frame_index / s->sheet->columns;
-    // Calculate normalized UV scale (size of one tile in 0.0 to 1.0 space)
+    if (s->sheet->columns == 0 || s->sheet->rows == 0) return;
+    //Safely wrap out-of-bounds rows and columns
+    row = row % s->sheet->rows;
+    col = col % s->sheet->columns;
+    //Track the 1D frame index internally
+    s->current_frame = (row * s->sheet->columns) + col;
+    //Flip row for OpenGL (Row 0 = Top of image)
+    u32 flipped_row = (s->sheet->rows - 1) - row;
+    //Calculate UV coordinates
     s->uv_scale = vect2_create(1.0f / (f32)s->sheet->columns, 1.0f / (f32)s->sheet->rows);
-    // Calculate normalized UV offset (starting position of the tile)
-    s->uv_offset = vect2_create((f32)col * s->uv_scale.x, (f32)row * s->uv_scale.y);
-    // Calculate exact bounding box coordinates
+    s->uv_offset = vect2_create((f32)col * s->uv_scale.x, (f32)flipped_row * s->uv_scale.y);
     s->uv_min = s->uv_offset;
     s->uv_max = vect2_create(s->uv_min.x + s->uv_scale.x, s->uv_min.y + s->uv_scale.y);
-}
-
-void sprite_set_frame_by_coord(sprite* s, u32 row, u32 col)
-{
-    if (!s || !s->sheet) return;
-    // Safety clamp: Ensure we don't request a column or row that doesn't exist
-    //if (col >= s->sheet->columns) col = s->sheet->columns - 1;
-   // if (row >= s->sheet->rows) row = s->sheet->rows - 1;
-    // Convert the 2D coordinates into your engine's 1D frame index
-    u32 calculated_frame_index = (row * s->sheet->columns) + col;
-    // Call your existing function to do the actual UV math
-    sprite_set_frame(s, calculated_frame_index);
 }

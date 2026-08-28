@@ -306,7 +306,7 @@ KAPI b8 application_run()
 	geometry_render_data my_ui_image = {};
 	my_ui_image.geometry = geometry_system_acquire_from_config(ui_config, TRUE);
 	my_ui_image.model = mat4_translation(vect3_create(10.0f, 10.0f, 0.0f));
-	//cube
+	/*//cube
 	geometry_config cube_config = geometry_system_generate_cube_config(4.0f, 4.0f, 4.0f, 1.0f, 1.0f, "test_cube", "test_mat_1");
 	geometry* cube_geom = geometry_system_acquire_from_config(cube_config, TRUE);
 	Mfree(cube_config.vertices, cube_config.vertex_size * cube_config.vertex_count, MEMORY_TAG_ARRAY);
@@ -320,12 +320,12 @@ KAPI b8 application_run()
 	geometry_render_data world_geometries[2] = {};
 	world_geometries[0].geometry = floor_geom;
 	world_geometries[1].geometry = cube_geom;
-
+	*/
 	//sprite
 	sprite_sheet* axul_sheet = sprite_system_create_sheet("axul_sheet", "axul_chars", "", 16, 24);
 	// 2. Create the character instance and set to Frame 52 (Middle Hero, Idle South)
 	sprite* hero_sprite = sprite_system_create_sprite("hero", axul_sheet);
-	sprite_set_frame_by_coord(hero_sprite, 5, 4);
+	sprite_set_frame(hero_sprite, 7, 4);
 
 	// 3. Generate a 2:3 aspect ratio plane quad (width 1.0, height 1.5 matches 16x24 proportions)
 	geometry_config sprite_quad_config = geometry_system_generate_plane_config(
@@ -449,11 +449,13 @@ KAPI b8 application_run()
 
 					i32 sprite_diffuse_unit = 0;
 					shader_system_set_uniform(sprite_shader, "diffuse_sampler", &sprite_diffuse_unit);
+
+					shadow_unit = 2;
+					shader_system_set_uniform(sprite_shader, "u_shadow_sampler", &shadow_unit);
+					shader_system_set_uniform(sprite_shader, "u_light_space_matrix", &light_space_mat);
+
 					shader_system_set_uniform(sprite_shader, "u_uv_offset", &hero_sprite->uv_offset);
 					shader_system_set_uniform(sprite_shader, "u_uv_scale", &hero_sprite->uv_scale);
-
-					f32 sprite_shininess = 8.0f;
-					shader_system_set_uniform(sprite_shader, "shininess", &sprite_shininess);
 
 					geometry_render_data hero_render_data = {};
 					hero_render_data.geometry = hero_geom;
