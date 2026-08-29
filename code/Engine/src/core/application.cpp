@@ -252,19 +252,7 @@ KAPI b8 application_create(game* game_inst)
 	}
 
 	app_state.game_inst->on_resize(app_state.game_inst, app_state.width, app_state.height);
-	
 
-	//test code cube and floor
-	geometry_config cube_config = geometry_system_generate_cube_config(4.0f, 4.0f, 4.0f, 1.0f, 1.0f, "test_cube", "test_mat_1");
-	scene_cube = geometry_system_acquire_from_config(cube_config, TRUE);
-	Mfree(cube_config.vertices, cube_config.vertex_size * cube_config.vertex_count, MEMORY_TAG_ARRAY);
-	Mfree(cube_config.indices, cube_config.index_size * cube_config.index_count, MEMORY_TAG_ARRAY);
-
-	geometry_config floor_config = geometry_system_generate_plane_config(30.0f, 30.0f, 5, 5, 5.0f, 5.0f, "test_floor", "test_mat_2");
-	scene_floor = geometry_system_acquire_from_config(floor_config, TRUE);
-	Mfree(floor_config.vertices, floor_config.vertex_size * floor_config.vertex_count, MEMORY_TAG_ARRAY);
-	Mfree(floor_config.indices, floor_config.index_size * floor_config.index_count, MEMORY_TAG_ARRAY);
-	
 	initialized = TRUE;
 	return TRUE;
 }
@@ -306,21 +294,19 @@ KAPI b8 application_run()
 	geometry_render_data my_ui_image = {};
 	my_ui_image.geometry = geometry_system_acquire_from_config(ui_config, TRUE);
 	my_ui_image.model = mat4_translation(vect3_create(10.0f, 10.0f, 0.0f));
-	/*//cube
+	
+
+	//test code cube and floor
 	geometry_config cube_config = geometry_system_generate_cube_config(4.0f, 4.0f, 4.0f, 1.0f, 1.0f, "test_cube", "test_mat_1");
-	geometry* cube_geom = geometry_system_acquire_from_config(cube_config, TRUE);
+	scene_cube = geometry_system_acquire_from_config(cube_config, TRUE);
 	Mfree(cube_config.vertices, cube_config.vertex_size * cube_config.vertex_count, MEMORY_TAG_ARRAY);
 	Mfree(cube_config.indices, cube_config.index_size * cube_config.index_count, MEMORY_TAG_ARRAY);
-	//floor
+
 	geometry_config floor_config = geometry_system_generate_plane_config(30.0f, 30.0f, 5, 5, 5.0f, 5.0f, "test_floor", "test_mat_2");
-	geometry* floor_geom = geometry_system_acquire_from_config(floor_config, TRUE);
+	scene_floor = geometry_system_acquire_from_config(floor_config, TRUE);
 	Mfree(floor_config.vertices, floor_config.vertex_size * floor_config.vertex_count, MEMORY_TAG_ARRAY);
 	Mfree(floor_config.indices, floor_config.index_size * floor_config.index_count, MEMORY_TAG_ARRAY);
-	//Store them in an array to pass into render packet
-	geometry_render_data world_geometries[2] = {};
-	world_geometries[0].geometry = floor_geom;
-	world_geometries[1].geometry = cube_geom;
-	*/
+
 	//sprite
 	sprite_sheet* axul_sheet = sprite_system_create_sheet("axul_sheet", "axul_chars", "", 16, 24);
 	//Create the character instance and set to Frame 52 (Middle Hero, Idle South)
