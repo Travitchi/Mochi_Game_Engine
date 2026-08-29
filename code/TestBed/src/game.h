@@ -7,7 +7,7 @@
 typedef struct game_state
 {
 	f32 delta_time;
-	
+	vect3 player_position;
 }game_state;
 
 b8 game_initialize(game* game_inst);

@@ -10,10 +10,10 @@ b8 game_initialize(game* game_inst)
 {
     MDEBUG("game_initialize called!");
     game_state* state = (game_state*)game_inst->state;
-
+    game_inst->player_position = vect3_create(0.0f, 0.75f, 6.0f);
     camera* active_cam = camera_system_get_default();
-    camera_position_set(active_cam, vect3{ 0.0f, 0.0f, 0.0f });
-    camera_rotation_set(active_cam, vect3{ 0.00f, 0.0f, 0.0f });
+    camera_position_set(active_cam, vect3{ 0.0f, 10.0f, 0.0f });
+    camera_rotation_set(active_cam, vect3_create(deg_to_rad(-30.0f), 0.0f, 0.0f));
     return TRUE;
 }
 
@@ -22,24 +22,45 @@ b8 game_update(game* game_inst, f32 delta_time)
     game_state* state = (game_state*)game_inst->state;
 
    camera* active_cam = camera_system_get_default();
-    f32 move_speed = 10.0f * delta_time;
-    f32 rot_speed = 1.0f * delta_time;
-
+    f32 move_speed = 5.0f * delta_time;
+    //f32 rot_speed = 1.0f * delta_time;
+    /*
     if (input_is_key_pressed(SDL_SCANCODE_LEFT)) { camera_yaw(active_cam, rot_speed); }
     if (input_is_key_pressed(SDL_SCANCODE_RIGHT)) { camera_yaw(active_cam, -rot_speed); }
     if (input_is_key_pressed(SDL_SCANCODE_UP)) { camera_pitch(active_cam, rot_speed); }
     if (input_is_key_pressed(SDL_SCANCODE_DOWN)) { camera_pitch(active_cam, -rot_speed); }
+    */
+    if (input_is_key_pressed(SDL_SCANCODE_W)) 
+    {
+        game_inst->player_position.z -= move_speed; 
+    }
+    if (input_is_key_pressed(SDL_SCANCODE_S)) 
+    {
+        game_inst->player_position.z += move_speed;
+    }
+    if (input_is_key_pressed(SDL_SCANCODE_A)) 
+    {
+        game_inst->player_position.x -= move_speed;
+    }
+    if (input_is_key_pressed(SDL_SCANCODE_D)) 
+    {
+        game_inst->player_position.x += move_speed; 
+    }
 
-    if (input_is_key_pressed(SDL_SCANCODE_W)) { camera_move_forward_planar(active_cam, move_speed); }
-    if (input_is_key_pressed(SDL_SCANCODE_S)) { camera_move_backward_planar(active_cam, move_speed); }
-    if (input_is_key_pressed(SDL_SCANCODE_A)) { camera_move_left(active_cam, move_speed); }
-    if (input_is_key_pressed(SDL_SCANCODE_D)) { camera_move_right(active_cam, move_speed); }
+    if (input_is_key_pressed(SDL_SCANCODE_SPACE))
+    { 
+        camera_move_up(active_cam, move_speed); 
+    }
+    if (input_is_key_pressed(SDL_SCANCODE_LSHIFT)) 
+    {
+        camera_move_down(active_cam, move_speed);
+    }
 
-    if (input_is_key_pressed(SDL_SCANCODE_SPACE)) { camera_move_up(active_cam, move_speed); }
-    if (input_is_key_pressed(SDL_SCANCODE_LSHIFT)) { camera_move_down(active_cam, move_speed); }
-
+    vect3 camera_offset = vect3_create(0.0f, 12.0f, 18.0f);
+    vect3 new_cam_pos = vect3_add(game_inst->player_position, camera_offset);
+    camera_position_set(active_cam, new_cam_pos);
     
-    
+    /*
     if (active_cam->is_dirty)
     {
         vect3 pos = camera_position_get(active_cam);
@@ -48,7 +69,7 @@ b8 game_update(game* game_inst, f32 delta_time)
         MINFO("Cam Pos [ X: %.2f | Y: %.2f | Z: %.2f ] || Rot [ P: %.2f | Y: %.2f ]",
             pos.x, pos.y, pos.z, rot.x, rot.y);
     }
-    
+    */
     return TRUE;
 }
 

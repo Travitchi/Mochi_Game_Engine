@@ -17,6 +17,6 @@ C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\math\M_math.h(6,1)
       see previous definition of 'M_PI'
   
 C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(47,2): warning C4091: 'typedef ': ignored on left of 'application_state' when no variable is declared
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(374,24): warning C4244: '=': conversion from 'f64' to 'f32', possible loss of data
-C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(490,22): warning C4244: 'initializing': conversion from 'f64' to 'u64', possible loss of data
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(364,24): warning C4244: '=': conversion from 'f64' to 'f32', possible loss of data
+C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\Engine\src\core\application.cpp(480,22): warning C4244: 'initializing': conversion from 'f64' to 'u64', possible loss of data
   Engine.vcxproj -> C:\Users\User\Desktop\MOCHI\Mochi_Game_Engine\code\bin\Debug\Engine.dll

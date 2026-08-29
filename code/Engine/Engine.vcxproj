@@ -181,6 +181,7 @@
     <ClInclude Include="src\resources\loaders\sprite_loader.h" />
     <ClInclude Include="src\resources\loaders\text_loader.h" />
     <ClInclude Include="src\resources\resource_types.h" />
+    <ClInclude Include="src\systems\animation_system.h" />
     <ClInclude Include="src\systems\camera_system.h" />
     <ClInclude Include="src\systems\geometry_systems.h" />
     <ClInclude Include="src\systems\light_system.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="src\resources\loaders\shader_loader.cpp" />
     <ClCompile Include="src\resources\loaders\sprite_loader.cpp" />
     <ClCompile Include="src\resources\loaders\text_loader.cpp" />
+    <ClCompile Include="src\systems\animation_system.cpp" />
     <ClCompile Include="src\systems\camera_system.cpp" />
     <ClCompile Include="src\systems\geometry_systems.cpp" />
     <ClCompile Include="src\systems\light_system.cpp" />

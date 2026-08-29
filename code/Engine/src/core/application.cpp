@@ -327,7 +327,7 @@ KAPI b8 application_run()
 	hero_geom->material->diffuse_map.texture = axul_sheet->diffuse_texture;
 
 	// 5. Place the sprite at Z = 2.0f (closer to camera than the cube), with Y = 0.75f so feet touch the ground
-	transform hero_transform = transform_from_position(vect3_create(0.0f, 0.75f, 6.0f));
+	transform hero_transform = transform_from_position(app_state.game_inst->player_position);
 
 	while (app_state.is_run)
 	{
@@ -356,6 +356,8 @@ KAPI b8 application_run()
 				app_state.is_run = FALSE;
 				break;
 			}
+
+			hero_transform = transform_from_position(app_state.game_inst->player_position);
 
 			//todo: refactor packet creation
 			render_packet packet = {};

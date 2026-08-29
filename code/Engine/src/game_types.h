@@ -1,5 +1,6 @@
 #pragma once
 #include "application.h"
+#include "math_type.h"
 
 typedef struct game
 {
@@ -13,4 +14,6 @@ typedef struct game
 	u64 state_memory_requirement;
 	void* state;
 
+	//shared data to be used by the game and engine
+	vect3 player_position;
 } game;
