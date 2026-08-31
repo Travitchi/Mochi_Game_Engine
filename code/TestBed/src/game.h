@@ -3,11 +3,17 @@
 #include <game_types.h>
 #include "M_math.h"
 #include "camera_system.h"
+#include "animation_system.h"
 
 typedef struct game_state
 {
 	f32 delta_time;
 	vect3 player_position;
+	animated_sprite walk_south;
+	animated_sprite walk_north;
+	animated_sprite walk_east;
+	animated_sprite walk_west;
+	sprite_keyframe current_idle;
 }game_state;
 
 b8 game_initialize(game* game_inst);

@@ -13,8 +13,8 @@ typedef struct sprite_sheet
     u32 height;
     u32 tile_width;
     u32 tile_height;
-    u32 columns;
     u32 rows;
+    u32 columns;
 } sprite_sheet;
 
 typedef struct sprite 

@@ -5,6 +5,7 @@
 #include "input.h"
 #include <SDL_scancode.h>
 #include "event.h"
+#include "sprite_manager_system.h"
 
 b8 game_initialize(game* game_inst) 
 {
@@ -14,6 +15,36 @@ b8 game_initialize(game* game_inst)
     camera* active_cam = camera_system_get_default();
     camera_position_set(active_cam, vect3{ 0.0f, 10.0f, 0.0f });
     camera_rotation_set(active_cam, vect3_create(deg_to_rad(-30.0f), 0.0f, 0.0f));
+    
+	// make sure to initialize the walk_south animation
+    static sprite_keyframe walk_s[4] = { {6,4}, {5,4}, {6,4}, {7,4} };
+    static sprite_keyframe walk_n[4] = { {6,0}, {5,0}, {6,0}, {7,0} };
+    static sprite_keyframe walk_e[4] = { {6,6}, {5,6}, {6,6}, {7,6} };
+    static sprite_keyframe walk_w[4] = { {6,2}, {5,2}, {6,2}, {7,2} };
+
+    // 2. Setup the South Animation
+    state->walk_south.frames = walk_s;
+    state->walk_south.frame_count = 4;
+    state->walk_south.frame_time = 0.12f;
+
+    // 3. Setup the North Animation
+    state->walk_north.frames = walk_n;
+    state->walk_north.frame_count = 4;
+    state->walk_north.frame_time = 0.12f;
+
+    // 4. Setup the East/West Animation
+    state->walk_east.frames = walk_e;
+    state->walk_east.frame_count = 4;
+    state->walk_east.frame_time = 0.12f;
+
+
+	state->walk_west.frames = walk_w;
+    state->walk_west.frame_count = 4;
+    state->walk_west.frame_time = 0.12f;
+
+    state->current_idle.row = 6;
+    state->current_idle.col = 4;
+
     return TRUE;
 }
 
@@ -30,21 +61,43 @@ b8 game_update(game* game_inst, f32 delta_time)
     if (input_is_key_pressed(SDL_SCANCODE_UP)) { camera_pitch(active_cam, rot_speed); }
     if (input_is_key_pressed(SDL_SCANCODE_DOWN)) { camera_pitch(active_cam, -rot_speed); }
     */
-    if (input_is_key_pressed(SDL_SCANCODE_W)) 
+
+    animated_sprite* active_anim = 0;
+    sprite* hero = sprite_system_get_sprite("hero");
+    if (input_is_key_pressed(SDL_SCANCODE_W))
     {
-        game_inst->player_position.z -= move_speed; 
+        game_inst->player_position.z -= move_speed;
+        active_anim = &state->walk_north;
+        state->current_idle = { 6, 0 };
     }
-    if (input_is_key_pressed(SDL_SCANCODE_S)) 
+    else if (input_is_key_pressed(SDL_SCANCODE_S))
     {
         game_inst->player_position.z += move_speed;
+        active_anim = &state->walk_south;
+        state->current_idle = { 6, 4 };
     }
-    if (input_is_key_pressed(SDL_SCANCODE_A)) 
+    else if (input_is_key_pressed(SDL_SCANCODE_A))
     {
         game_inst->player_position.x -= move_speed;
+        active_anim = &state->walk_east;
+        state->current_idle = { 6, 6 };
+        
     }
-    if (input_is_key_pressed(SDL_SCANCODE_D)) 
+    else if (input_is_key_pressed(SDL_SCANCODE_D))
     {
-        game_inst->player_position.x += move_speed; 
+        game_inst->player_position.x += move_speed;
+        active_anim = &state->walk_west;
+        state->current_idle = { 6, 2 };
+        
+    }
+
+    if (active_anim)
+    {
+        sprite_animation_update(hero, active_anim, delta_time);
+    }
+    else
+    {
+        sprite_set_frame(hero, state->current_idle.row, state->current_idle.col);
     }
 
     if (input_is_key_pressed(SDL_SCANCODE_SPACE))
@@ -60,7 +113,7 @@ b8 game_update(game* game_inst, f32 delta_time)
     vect3 new_cam_pos = vect3_add(game_inst->player_position, camera_offset);
     camera_position_set(active_cam, new_cam_pos);
     
-    /*
+    /* Remove the comment to see the active camera position on the console
     if (active_cam->is_dirty)
     {
         vect3 pos = camera_position_get(active_cam);
