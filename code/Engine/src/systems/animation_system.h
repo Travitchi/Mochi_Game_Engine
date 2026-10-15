@@ -5,7 +5,6 @@
 
 struct sprite_keyframe
 {
-	
 	u32 row;
 	u32 col;
 };

@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <string.h>
 #include "Platform.h"
+#include "darray.h"
 #include "render_buffer.h"
 #include "opengl_image.h"
 #include "opengl_shader.h"
@@ -31,8 +32,7 @@ typedef struct opengl_state
     f32 fov;
     f32 near_clip;
 	f32 far_clip;
-    opengl_geometry_data geometries[4096];
-    u32 next_internal_geometry_id;
+    opengl_geometry_data* geometries;
     u32 ui_vao;
 
 } opengl_state;
@@ -160,7 +160,15 @@ b8 opengl_backend_initialize(renderer_backend* backend, const char* application_
     glBindVertexArray(0);
     
 
-    state_ptr->next_internal_geometry_id = 0;
+	state_ptr->geometries = (opengl_geometry_data*)_darray_create(4000, sizeof(opengl_geometry_data));
+    if(!state_ptr->geometries)
+    {
+        MERROR("Failed to create geometries array!");
+        return FALSE;
+	}
+    opengl_geometry_data dummy;
+	Mzero_memory(&dummy, sizeof(opengl_geometry_data));
+	state_ptr->geometries = (opengl_geometry_data*)_darray_push(state_ptr->geometries, &dummy);
 
     opengl_backend_resized(backend, 1280, 720);
 

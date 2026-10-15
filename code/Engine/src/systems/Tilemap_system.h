@@ -22,8 +22,8 @@ typedef struct tilemap
 
 typedef struct tile
 {
-	b8 tile_id;
-	struct sprite* tile_sprite;
+	b8 tile_id; // Indicates if it's upright or flat
+	struct sprite* tile_sprite; 
 
 	
 };
